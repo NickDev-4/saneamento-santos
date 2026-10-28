@@ -1,0 +1,296 @@
+/* The sheet owns resizing; the list/preview own their native scrolling. */
+.sheet-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.mobile-map-title {
+  display: none;
+}
+
+/* Floating controls share one size and finish across the map views. */
+.map-controls {
+  gap: 8px;
+}
+
+.map-controls button,
+.map-workspace .mobile-search > .icon-button,
+.map-workspace .map-legend-toggle,
+.map-workspace .sheet-filter,
+.map-workspace .preview-heading > .icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid #e4ebe5;
+  border-radius: 50%;
+  background: #fff;
+  color: #527568;
+  box-shadow: 0 2px 8px #2946330d;
+  transition: background-color 150ms, border-color 150ms;
+}
+
+.map-controls button,
+.map-workspace .mobile-search > .icon-button,
+.map-workspace .sheet-filter,
+.map-workspace .preview-heading > .icon-button {
+  width: 44px;
+  flex-shrink: 0;
+}
+
+.map-workspace .map-legend-toggle {
+  gap: 7px;
+  padding: 0 13px;
+  border-radius: 22px;
+}
+
+.map-controls button > svg,
+.map-workspace .mobile-search > .icon-button > svg,
+.map-workspace .map-legend-toggle > svg,
+.map-workspace .sheet-filter > svg,
+.map-workspace .preview-heading > .icon-button > svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 1.8;
+}
+
+.map-controls button:hover,
+.map-workspace .mobile-search > .icon-button:hover,
+.map-workspace .map-legend-toggle:hover,
+.map-workspace .sheet-filter:hover,
+.map-workspace .preview-heading > .icon-button:hover {
+  background: #f0f6f3;
+  border-color: #c3d7cc;
+}
+
+.map-controls button:active,
+.map-workspace .mobile-search > .icon-button:active,
+.map-workspace .map-legend-toggle:active,
+.map-workspace .sheet-filter:active,
+.map-workspace .preview-heading > .icon-button:active {
+  background: #e3efe8;
+}
+
+.map-controls button:focus-visible,
+.map-workspace .mobile-search > .icon-button:focus-visible,
+.map-workspace .map-legend-toggle:focus-visible,
+.map-workspace .sheet-filter:focus-visible,
+.map-workspace .preview-heading > .icon-button:focus-visible {
+  outline: 2px solid #528d7c;
+  outline-offset: 3px;
+}
+
+@media (max-width: 767.98px) {
+  .map-page > .page-title {
+    display: none;
+  }
+
+  .map-page > .mobile-map-title {
+    display: block;
+  }
+
+  .map-page .map-workspace {
+    height: calc(100dvh - var(--header-height) - var(--nav-height) - env(safe-area-inset-bottom));
+    min-height: 0;
+    overscroll-behavior: none;
+  }
+
+  .mobile-search {
+    top: 12px;
+    right: 68px;
+    align-items: center;
+    pointer-events: none;
+  }
+
+  .map-workspace .map-controls {
+    top: 12px;
+    right: 16px;
+  }
+
+  .mobile-search > * {
+    pointer-events: auto;
+  }
+
+  .mobile-search-field {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    max-width: 280px;
+    height: 44px;
+    padding-left: 13px;
+    border: 1px solid #e4ebe5;
+    border-radius: 22px;
+    background: #fff;
+    color: #789287;
+    box-shadow: 0 2px 8px #2946330d;
+  }
+
+  .mobile-search-field:focus-within {
+    border-color: #81aea0;
+    box-shadow: 0 0 0 2px #86c0b233;
+  }
+
+  .mobile-search-field > svg {
+    flex-shrink: 0;
+  }
+
+  .map-page .mobile-search-field input {
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    height: 42px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #345a49;
+    font-size: var(--text-body);
+  }
+
+  .map-page .mobile-search-field input:focus-visible {
+    outline: 0;
+  }
+
+  .mobile-search-field input::placeholder {
+    color: var(--text-secondary);
+  }
+
+  .mobile-search-field > button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #789287;
+  }
+
+  .map-sheet {
+    height: clamp(200px, 48%, 275px);
+    max-height: calc(100% - 78px);
+    transition: height 240ms cubic-bezier(.2, .7, .2, 1);
+    overflow: hidden;
+  }
+
+  .sheet-expanded .map-sheet {
+    height: calc(100% - 78px);
+  }
+
+  .map-sheet.is-dragging {
+    transition: none;
+    user-select: none;
+  }
+
+  .sheet-handle {
+    min-height: 32px;
+    flex-shrink: 0;
+    touch-action: none;
+    cursor: grab;
+  }
+
+  [data-sheet-drag-area] {
+    touch-action: none;
+    user-select: none;
+  }
+
+  .is-dragging [data-sheet-drag-area] {
+    cursor: grabbing;
+  }
+
+  .sheet-cases,
+  .case-preview {
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
+
+  .sheet-cases {
+    padding-bottom: 20px;
+  }
+
+  .case-preview .preview-body {
+    padding-bottom: 40px;
+  }
+
+  .map-sheet .case-type,
+  .map-sheet .case-meta {
+    color: var(--text-secondary);
+    font-size: var(--text-small);
+  }
+
+  .map-sheet .case-card-top > small {
+    color: var(--text-secondary);
+  }
+
+  .map-sheet .status-badge {
+    font-size: var(--text-small);
+  }
+
+  .sheet-title p {
+    color: var(--text-secondary);
+    font-size: var(--text-small);
+  }
+
+  .filter-chips > button {
+    color: var(--text-secondary);
+    font-size: var(--text-small);
+    min-height: 36px;
+  }
+
+  .bottom-nav > a {
+    color: var(--text-secondary);
+  }
+
+  .sheet-title,
+  .sheet-search,
+  .filter-chips,
+  .sheet-footer {
+    flex-shrink: 0;
+  }
+
+  .map-legend-toggle {
+    bottom: calc(clamp(200px, 48%, 275px) + 15px);
+  }
+
+  .map-legend {
+    bottom: calc(clamp(200px, 48%, 275px) + 67px);
+  }
+
+  .sheet-expanded .map-legend-toggle {
+    display: none;
+  }
+
+  .sheet-filter {
+    display: inline-flex;
+  }
+
+  .sheet-size {
+    display: none;
+  }
+
+  .map-page input {
+    font-size: var(--text-body);
+  }
+
+  .map-workspace .leaflet-control-attribution {
+    max-width: calc(100vw - 110px);
+  }
+}
+
+@media (min-width: 768px) {
+  .map-workspace .map-legend {
+    bottom: 95px;
+  }
+}
