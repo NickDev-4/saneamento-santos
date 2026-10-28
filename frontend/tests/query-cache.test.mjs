@@ -1,20 +1,25 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { QueryCache } from '../src/app/data/query-cache.ts';
-import { ApiError } from '../src/services/api-error.ts';
+import { ApiError } from '../src/shared/errors/ApiError.ts';
 
 const deferred = () => {
   let resolve;
-  const promise = new Promise(done => { resolve = done; });
+  const promise = new Promise((done) => {
+    resolve = done;
+  });
   return { promise, resolve };
 };
-const flush = () => new Promise(resolve => setImmediate(resolve));
+const flush = () => new Promise((resolve) => setImmediate(resolve));
 
 test('duas telas compartilham uma requisição e o resultado em cache', async () => {
   const cache = new QueryCache();
   const response = deferred();
   let calls = 0;
-  const load = () => { calls++; return response.promise; };
+  const load = () => {
+    calls++;
+    return response.promise;
+  };
   const first = cache.fetch('public', load, ['cases']);
   const second = cache.fetch('public', load, ['cases']);
   assert.equal(first, second);
@@ -31,8 +36,14 @@ test('alterar um chamado atualiza consultas ativas e marca as inativas para a pr
   let value = 'recebido';
   let activeCalls = 0;
   let inactiveCalls = 0;
-  const load = async () => { activeCalls++; return value; };
-  const inactive = async () => { inactiveCalls++; return value; };
+  const load = async () => {
+    activeCalls++;
+    return value;
+  };
+  const inactive = async () => {
+    inactiveCalls++;
+    return value;
+  };
   const unsubscribe = cache.subscribe('detail', () => {});
   await cache.fetch('detail', load, ['cases']);
   await cache.fetch('list', inactive, ['cases']);
@@ -55,7 +66,7 @@ test('uma resposta anterior à alteração não sobrescreve dados novos', async 
   const cache = new QueryCache();
   const old = deferred();
   let calls = 0;
-  const load = () => ++calls === 1 ? old.promise : Promise.resolve('novo');
+  const load = () => (++calls === 1 ? old.promise : Promise.resolve('novo'));
   cache.subscribe('detail', () => {});
   const pending = cache.fetch('detail', load, ['cases']);
   await flush();

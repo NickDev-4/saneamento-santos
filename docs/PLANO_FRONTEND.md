@@ -182,24 +182,26 @@ O ViaCEP retorna dados de endereço, sem latitude/longitude em seu exemplo docum
 
 Leaflet cuida da apresentação e das interações do mapa. O provedor das imagens do mapa e o serviço de geocodificação serão configuráveis e precisam ser escolhidos no alinhamento técnico. Não pressupor capacidade ilimitada dos serviços públicos de mapas. Se forem utilizados tiles públicos do OpenStreetMap, seguir sua política, manter atribuição visível e não implementar download em massa/offline.
 
-## 7. Organização proposta do front-end
+## 7. Organização do front-end
 
-Estrutura a criar somente na implementação:
+Estrutura implementada, detalhada em [ARQUITETURA_FRONTEND.md](ARQUITETURA_FRONTEND.md):
 
 ```text
 frontend/
   src/
-    app/                 # inicialização, rotas e layouts dos perfis
-    components/          # botões, campos, cartões, etiquetas e diálogos
+    app/                 # providers, rotas por perfil, layout e cache
+    shared/              # botões, campos, diálogos, formatação e erros
     features/
       auth/
-      mapa/
-      chamados/
-      atendimento/
-      prefeitura/
-      notificacoes/
-      perfil/
-    services/            # cliente HTTP e serviços por recurso
+      map/
+      cases/             # páginas, cartões, consultas e operações de atendimento
+      report/            # etapas, fotos e validação do registro
+      staff/
+      cityhall/
+      notices/
+      profile/
+      addresses/
+    services/            # cliente HTTP e serviços HTTP/demo por domínio
     contracts/           # tipos de dados trocados com a API Java
     mocks/               # cenários fictícios e respostas de demonstração
     styles/              # tokens e estilos compartilhados

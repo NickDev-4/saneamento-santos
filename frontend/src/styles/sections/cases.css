@@ -1,0 +1,162 @@
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  font-size: var(--text-small);
+  line-height: 1.3;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--text-secondary);
+  background: #edf2ef;
+}
+.status-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.status-em_analise {
+  color: #795712;
+  background: #fbf3df;
+}
+.status-visita_agendada {
+  color: #286183;
+  background: #eaf3f9;
+}
+.status-em_atendimento {
+  color: #396247;
+  background: #eaf2e9;
+}
+.status-resolvido {
+  color: #1c644f;
+  background: #e4f3ed;
+}
+.status-recebido {
+  color: #63577e;
+  background: #f0edf8;
+}
+.status-vinculado {
+  color: #48617f;
+  background: #edf1f8;
+}
+.status-cancelado,
+.status-encerrado_sem_atendimento {
+  color: #665855;
+  background: #f3efee;
+}
+.case-card {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  gap: 12px;
+  text-align: left;
+  padding: 19px 18px;
+  background: #fff;
+  border: 0;
+  border-bottom: 1px solid #edf1ee;
+  transition: background 0.15s;
+  color: inherit;
+}
+.case-card:hover,
+.case-card.selected {
+  background: #f5f9f6;
+}
+.case-card:last-child {
+  border-bottom: 0;
+}
+.case-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 39px;
+  border-radius: 11px;
+  background: #edf5f0;
+  color: #68957a;
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+.case-card-body {
+  flex: 1;
+  min-width: 0;
+}
+.case-card-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 7px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.case-card-top > small {
+  font-size: var(--text-caption);
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+}
+.case-card-body > strong {
+  display: block;
+  font-size: var(--text-body);
+  font-weight: 600;
+  line-height: 1.5;
+  margin-bottom: 3px;
+}
+.case-type {
+  display: block;
+  color: var(--text-secondary);
+  font-size: var(--text-small);
+  margin-bottom: 8px;
+}
+.case-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-secondary);
+  font-size: var(--text-small);
+}
+.case-meta > span {
+  padding: 0 3px;
+  color: var(--text-secondary);
+}
+.case-chevron {
+  display: none;
+  margin-top: 27px;
+  color: var(--text-secondary);
+}
+.visit-window {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  background: #f0f7f3;
+  padding: 15px;
+  border: 1px solid #e4eee8;
+  border-radius: 12px;
+}
+.visit-icon {
+  width: 34px;
+  height: 36px;
+  border-radius: 10px;
+  background: #e0eee4;
+  color: #5c8a6d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.visit-window strong {
+  display: block;
+  font-size: var(--text-body);
+  color: #3b6e57;
+  margin-top: 4px;
+}
+.visit-window .small {
+  font-size: var(--text-small);
+  color: var(--text-secondary);
+}
+.visit-compact {
+  background: transparent;
+  padding: 8px 0;
+  border: 0;
+}
+.visit-compact .visit-icon {
+  display: none;
+}

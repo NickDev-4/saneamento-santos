@@ -16,10 +16,18 @@ export default async function setup() {
     if (previousMode === undefined) delete process.env.VITE_DATA_MODE;
     else process.env.VITE_DATA_MODE = previousMode;
   };
-  try { await server.listen(); }
-  catch (error) { await server.close(); restore(); throw error; }
+  try {
+    await server.listen();
+  } catch (error) {
+    await server.close();
+    restore();
+    throw error;
+  }
   return async () => {
-    try { await server.close(); }
-    finally { restore(); }
+    try {
+      await server.close();
+    } finally {
+      restore();
+    }
   };
 }

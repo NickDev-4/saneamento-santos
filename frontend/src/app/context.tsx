@@ -1,17 +1,21 @@
-﻿import type { ReactNode } from 'react';
-import type { Api } from '../contracts';
-import { api } from '../services';
-import { ApiProvider } from './contexts/api-context';
-import { AuthProvider } from './contexts/auth-context';
-import { DataProvider } from './contexts/data-context';
-import { FeedbackProvider } from './contexts/feedback-context';
+export { AppProvider } from './providers/AppProvider';
 
-export { useAuth } from './contexts/auth-context';
-export { useFeedback } from './contexts/feedback-context';
-export { useCases, useCase, useCaseTypes, useCaseActions, useNotices, useIndicators, useProfileActions, useAddressActions } from './contexts/data-context';
+export { useAuth } from './contexts/auth/useAuth';
 
-export function AppProvider({ children, service = api }: { children: ReactNode; service?: Api }) {
-  return <ApiProvider service={service}>
-    <FeedbackProvider><AuthProvider><DataProvider>{children}</DataProvider></AuthProvider></FeedbackProvider>
-  </ApiProvider>;
-}
+export { useFeedback } from './contexts/feedback/useFeedback';
+
+export { useCases } from '@/features/cases/hooks/useCases';
+
+export { useCase } from '@/features/cases/hooks/useCase';
+
+export { useCaseTypes } from '@/features/cases/hooks/useCaseTypes';
+
+export { useCaseActions } from '@/features/cases/context/useCaseActions';
+
+export { useNotices } from '@/features/notices/hooks/useNotices';
+
+export { useIndicators } from '@/features/cityhall/hooks/useIndicators';
+
+export { useProfileActions } from '@/features/profile/hooks/useProfileActions';
+
+export { useAddressActions } from '@/features/addresses/context/useAddressActions';

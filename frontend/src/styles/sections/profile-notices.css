@@ -1,0 +1,213 @@
+.profile-layout {
+  display: grid;
+  gap: 20px;
+}
+.profile-summary {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  overflow: hidden;
+  text-align: center;
+  padding-bottom: 24px;
+}
+.profile-cover {
+  height: 110px;
+  position: relative;
+  overflow: hidden;
+  background: #e5f0e8;
+  color: var(--text-secondary);
+}
+.profile-cover svg {
+  position: absolute;
+  left: 50%;
+  top: -47px;
+  width: 400px;
+  height: 220px;
+  transform: translateX(-50%) rotate(-10deg);
+}
+.profile-avatar {
+  position: relative;
+  margin: -40px auto 15px;
+  border: 6px solid white;
+  background: #a8c5ad;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 600;
+  border-radius: 50%;
+}
+.profile-summary h2 {
+  margin-bottom: 12px;
+  font-size: 1.375rem;
+}
+.profile-role {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--text-small);
+  color: var(--text-secondary);
+  border-radius: 6px;
+  padding: 6px 10px;
+  background: #f0f6eb;
+}
+.profile-summary > p {
+  font-size: var(--text-body);
+  color: var(--text-secondary);
+  margin: 12px 0 20px;
+}
+.profile-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 22px 20px 0;
+  gap: 12px;
+}
+.profile-stats > div {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 9px;
+  background: #edf5fa;
+  color: var(--text-secondary);
+  border-radius: 13px;
+  padding: 19px 10px;
+}
+.profile-stats > div:nth-child(2) {
+  background: #edf5e7;
+  color: var(--text-secondary);
+}
+.profile-stats strong {
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+.profile-stats span {
+  font-size: var(--text-small);
+}
+.profile-menu {
+  padding: 22px;
+}
+.profile-menu > h2 {
+  font-size: 1rem;
+  margin-bottom: 7px;
+}
+.profile-menu > a,
+.profile-menu > button {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 0;
+  border: 0;
+  border-bottom: 1px solid #edf1e7;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  color: var(--text-secondary);
+}
+.profile-menu > :last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.profile-menu > a > span,
+.profile-menu > button > span {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+.profile-menu strong {
+  font-size: var(--text-body);
+  color: var(--text-secondary);
+}
+.profile-menu small {
+  font-size: var(--text-small);
+  color: var(--text-secondary);
+}
+.demo-profile {
+  margin-top: 20px;
+  padding: 23px;
+}
+.demo-profile h2 {
+  font-size: 1.0625rem;
+  margin-bottom: 10px;
+}
+.demo-profile p {
+  font-size: var(--text-body);
+  color: var(--text-secondary);
+}
+.demo-profile .eyebrow {
+  font-size: var(--text-caption);
+}
+.notices-list {
+  padding: 0 20px;
+}
+.notice {
+  display: flex;
+  gap: 14px;
+  padding: 24px 0;
+  border-bottom: 1px solid #eaf0e4;
+}
+.notice:last-child {
+  border: 0;
+}
+.notice-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: #f1f5e9;
+  border-radius: 12px;
+  width: 40px;
+  height: 42px;
+  color: #93aa7f;
+}
+.notice.unread .notice-icon {
+  background: #e7f1e2;
+  color: #729965;
+}
+.notice > div {
+  min-width: 0;
+  flex: 1;
+}
+.notice-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: space-between;
+  margin-bottom: 9px;
+}
+.notice h2 {
+  font-size: var(--text-body);
+  line-height: 1.5;
+  margin: 0;
+}
+.notice time {
+  font-size: var(--text-caption);
+  color: var(--text-secondary);
+}
+.notice p {
+  font-size: var(--text-body);
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin-bottom: 14px;
+}
+.notice-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+.notice-actions > a,
+.notice-actions > button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--text-small);
+  color: var(--text-secondary);
+  border: 0;
+  background: none;
+  padding: 6px 0;
+}

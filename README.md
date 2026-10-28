@@ -27,6 +27,8 @@ Dentro de `frontend/`:
 ```powershell
 npm.cmd test
 npm.cmd run test:e2e
+npm.cmd run check:architecture
+npm.cmd run format:check
 npm.cmd run build
 ```
 
@@ -54,10 +56,14 @@ O mapa usa Leaflet e os tiles configurados em `VITE_MAP_TILE_URL`. Sua exibiçã
 
 ## Organização
 
-- `frontend/src/features/`: telas e fluxos dos três perfis.
-- `frontend/src/components/`: componentes compartilhados e mapa.
-- `frontend/src/app/contexts/`: sessão, dados e mensagens via Context API.
-- `frontend/src/services/`: adapters de demonstração e HTTP.
+- `frontend/src/features/`: funcionalidades com páginas, componentes, hooks e contexts próprios.
+- `frontend/src/shared/`: componentes visuais reutilizáveis, formatação e erros tipados.
+- `frontend/src/app/routes/`: rotas públicas, rotas por perfil e proteção de acesso.
+- `frontend/src/app/layout/`: cabeçalho e navegação compartilhados.
+- `frontend/src/app/contexts/`: sessão, injeção de API e mensagens via Context API.
+- `frontend/src/app/data/`: cache por sessão, consultas e invalidação.
+- `frontend/src/services/http/`: cliente HTTP e endpoints separados por domínio.
+- `frontend/src/services/demo/`: serviços de demonstração com estado isolado por instância.
 - `frontend/src/contracts/`: tipos compartilhados da integração.
 - `frontend/tests/`: testes de cache e integração.
 - `docs/`: planejamento e documentação técnica.
@@ -67,6 +73,7 @@ O mapa usa Leaflet e os tiles configurados em `VITE_MAP_TILE_URL`. Sua exibiçã
 
 - [Plano do front-end](docs/PLANO_FRONTEND.md)
 - [Fluxo de dados e Context API](docs/FLUXO_DADOS_FRONTEND.md)
+- [Arquitetura e organização dos arquivos](docs/ARQUITETURA_FRONTEND.md)
 - [Contrato de API proposto](docs/CONTRATO_API_PROPOSTO.md)
 
 Os registros, usuários e imagens ilustrativas da demonstração são fictícios. A existência de perfis institucionais no protótipo não representa adoção oficial pelas instituições.
