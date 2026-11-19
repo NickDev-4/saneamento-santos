@@ -20,7 +20,7 @@ class SecurityConfigurationTests {
 
 	@Test
 	void permitsAnonymousPublicApiReads() throws Exception {
-		mockMvc.perform(get("/api/v1/public/chamados"))
+		mockMvc.perform(get("/api/v1/public/rota-inexistente"))
 				.andExpect(status().isNotFound());
 	}
 

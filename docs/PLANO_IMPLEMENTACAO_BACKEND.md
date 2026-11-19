@@ -1,6 +1,6 @@
 # Plano de implementação do backend
 
-Este documento organiza a entrega da API Java/Spring e define os fluxos de negócio, as rotas e os critérios de conclusão. Ele complementa o [contrato da API](CONTRATO_API_PROPOSTO.md) e os serviços HTTP existentes no front-end. As rotas listadas são o contrato-alvo; somente `/api/v1/health` está implementada neste momento.
+Este documento organiza a entrega da API Java/Spring e define os fluxos de negócio, as rotas e os critérios de conclusão. Ele complementa o [contrato da API](CONTRATO_API_PROPOSTO.md) e os serviços HTTP existentes no front-end. As rotas listadas são o contrato-alvo; o estado real de implementação é registrado na seção final.
 
 ## 1. Objetivo e decisões de base
 
@@ -64,18 +64,20 @@ Cadastro público cria somente cidadão. Contas Sabesp/Prefeitura são provision
 | `GET /auth/me` | Sessão | Restaurar o usuário atual; `401` significa sessão ausente/expirada. |
 | `POST /auth/logout` | Sessão + CSRF | Invalidar a sessão no servidor e limpar cookies. |
 | `PATCH /me` | Cidadão + CSRF | Alterar somente campos permitidos do próprio perfil (nome/telefone no adapter atual). |
-| `POST /auth/recuperacao` | Público + CSRF | Iniciar recuperação; resposta uniforme para e-mail existente ou não, sem enumeração de contas. |
+| `POST /auth/recuperacao` | Público + CSRF | Iniciar recuperação; quando o canal estiver configurado, responder uniformemente sem enumeração de contas. |
 | `POST /auth/redefinicao` | Público + CSRF | Validar token de uso único e expiração, trocar a senha e invalidar sessões existentes. |
 
 **Sequência:** `GET /auth/csrf` → cadastro ou login → `GET /auth/me` ao restaurar a aplicação → `PATCH /me` conforme necessário → logout. Recuperação: `POST /auth/recuperacao` → entrega externa do token → `POST /auth/redefinicao` → login.
 
 Senhas devem ser armazenadas com algoritmo adaptativo aprovado pelo Spring Security; jamais em texto puro ou log. Tokens de recuperação devem ser de uso único, armazenados de forma não reversível e expirar. Não confirmar a existência de conta na resposta de recuperação.
 
+Até a escolha/configuração do serviço de entrega, ambas as rotas de recuperação respondem explicitamente `503 RECOVERY_DELIVERY_UNAVAILABLE`; não geram token nem afirmam que um e-mail foi enviado.
+
 ### Pipeline C — consulta pública, mapa e endereços
 
 | Método e rota | Acesso | Uso |
 |---|---|---|
-| `GET /public/tipos-chamado` | Público | Retornar o catálogo de tipos ativo, sem inventar categorias no front-end. |
+| `GET /public/tipos-chamado` | Público | Retornar o catálogo de tipos ativo, sem inventar categorias no front-end. Se ainda não houver tipos provisionados, retorna lista vazia. |
 | `GET /public/chamados` | Público | Lista paginada de chamados principais aprovados para publicação. Aceita filtros `status`, `tipoId`, `bairro`, `criadoDe`, `criadoAte`, `q`, `bbox`, `page` e `size`. |
 | `GET /public/chamados/{id}` | Público | Detalhe público somente se publicado; nunca incluir dados pessoais ou observações internas. |
 | `GET /enderecos/cep/{cep}` | Público, com limite de uso | Consultar CEP e retornar endereço/sugestão; falha externa não deve impedir preenchimento manual. |
@@ -83,7 +85,7 @@ Senhas devem ser armazenadas com algoritmo adaptativo aprovado pelo Spring Secur
 
 **Sequência de descoberta:** carregar tipos → consultar lista/mapa com filtros e paginação → consultar detalhe público. `bbox` segue `minLongitude,minLatitude,maxLongitude,maxLatitude`; coordenadas ficam em campos nomeados. O backend valida faixas, datas, tamanho de página e limites da área de busca.
 
-CEP/geocodificação usam interfaces de provedor configuráveis, timeouts e tratamento explícito de indisponibilidade. Não expor chaves do provedor ao navegador. A escolha do provedor fica isolada em `infrastructure/geocoding`.
+CEP usa ViaCEP com timeouts e tratamento explícito de indisponibilidade. Não expor chaves do provedor ao navegador. A rota de geocodificação responde explicitamente `503 GEOCODING_PROVIDER_UNAVAILABLE` até que o provedor seja escolhido e configurado.
 
 ### Pipeline D — abertura e acompanhamento do chamado pelo cidadão
 
@@ -214,4 +216,8 @@ Pipeline esperado para cada pull request:
 
 ## 8. Situação atual
 
-Commit 1 concluído: health em `/api/v1/health`, erros padronizados, sessão, CSRF, cookies configuráveis e políticas de acesso estão implementados e cobertos por testes. As demais rotas deste documento são planejamento e não devem ser tratadas como endpoints disponíveis até serem implementadas e testadas.
+Commit 1 concluído: health em `/api/v1/health`, erros padronizados, sessão, CSRF, cookies configuráveis e políticas de acesso estão implementados e cobertos por testes.
+
+Commit 2 entregue: cadastro de cidadão, login/logout de sessão, consulta/atualização do perfil, catálogo e consultas públicas paginadas, CEP via ViaCEP e bootstrap CSRF automático no cliente HTTP estão implementados. E-mails são normalizados e protegidos por índice único; senhas usam BCrypt e o hash não é guardado no principal da sessão.
+
+Recuperação de senha e geocodificação retornam `503` explicitamente até a configuração dos provedores; o catálogo retorna `[]` até que os tipos oficiais sejam provisionados. Chamados públicos só terão dados após a entrega de escrita/persistência do commit 3. Em produção, manter `MONGODB_AUTO_INDEX_CREATION=true` (padrão) ou provisionar o índice único `uq_users_email` antes de atender requisições.

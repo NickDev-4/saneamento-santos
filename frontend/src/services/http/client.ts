@@ -17,18 +17,59 @@ export interface HttpClient {
 export function createHttpClient(options: HttpClientOptions = {}): HttpClient {
   const base = (options.baseUrl ?? environment.apiBaseUrl).replace(/\/$/, '');
   const fetcher = options.fetch ?? globalThis.fetch.bind(globalThis);
+  let csrfBootstrap: Promise<string> | undefined;
+  const readCsrfToken = () => {
+    if (options.csrfToken) return options.csrfToken();
+    if (typeof document === 'undefined') return undefined;
+    return document.cookie
+      .split('; ')
+      .find((cookie) => cookie.startsWith('XSRF-TOKEN='))
+      ?.slice(11);
+  };
+
+  async function bootstrapCsrfToken(): Promise<string> {
+    let response: Response;
+    try {
+      response = await fetcher(`${base}/auth/csrf`, { credentials: 'include' });
+    } catch {
+      throw new ApiError(
+        'Não foi possível iniciar uma sessão segura. Verifique sua conexão e tente novamente.',
+        0,
+      );
+    }
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new ApiError(
+        error.message || 'Não foi possível iniciar uma sessão segura.',
+        response.status,
+        error.fieldErrors,
+      );
+    }
+    const token = readCsrfToken();
+    if (!token) {
+      throw new ApiError('O servidor não forneceu um token de segurança.', 0);
+    }
+    return decodeURIComponent(token);
+  }
+
+  async function csrfHeader(): Promise<string> {
+    const token = readCsrfToken();
+    if (token) return decodeURIComponent(token);
+    if (!csrfBootstrap) csrfBootstrap = bootstrapCsrfToken();
+    try {
+      return await csrfBootstrap;
+    } finally {
+      csrfBootstrap = undefined;
+    }
+  }
+
   async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
     const headers = new Headers(init.headers);
     if (init.body && !(init.body instanceof FormData))
       headers.set('Content-Type', 'application/json');
-    const csrf = options.csrfToken
-      ? options.csrfToken()
-      : document.cookie
-          .split('; ')
-          .find((c) => c.startsWith('XSRF-TOKEN='))
-          ?.slice(11);
-    if (csrf && init.method && init.method !== 'GET')
-      headers.set('X-XSRF-TOKEN', decodeURIComponent(csrf));
+    const method = (init.method ?? 'GET').toUpperCase();
+    if (!['GET', 'HEAD', 'OPTIONS'].includes(method))
+      headers.set('X-XSRF-TOKEN', await csrfHeader());
     let response: Response;
     try {
       response = await fetcher(`${base}${path}`, { ...init, headers, credentials: 'include' });

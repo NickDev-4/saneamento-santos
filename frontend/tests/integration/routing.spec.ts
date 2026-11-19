@@ -47,7 +47,7 @@ test('equipe Sabesp não abre o registro exclusivo de cidadão', async ({ page }
 });
 
 test('login retorna ao endereço protegido com seus parâmetros', async ({ page }) => {
-  await backend(page, null);
+  const { counts } = await backend(page, null);
   await page.goto('/meus-chamados?origem=teste');
   await expect(page.getByRole('button', { name: 'Entrar na conta', exact: true })).toBeVisible();
   await page.getByLabel('E-mail', { exact: true }).fill(demoUsers.CIDADAO.email);
@@ -55,6 +55,7 @@ test('login retorna ao endereço protegido com seus parâmetros', async ({ page 
   await page.getByRole('button', { name: 'Entrar na conta', exact: true }).click();
   await page.waitForURL('**/meus-chamados?origem=teste');
   await expect(page.getByRole('heading', { name: 'Meus chamados', exact: true })).toBeVisible();
+  expect(counts.get('GET /auth/csrf')).toBe(1);
 });
 
 test('instâncias do adapter de demonstração isolam sessão e alterações', async ({ page }) => {

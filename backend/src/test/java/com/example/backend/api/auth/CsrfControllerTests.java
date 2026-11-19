@@ -39,6 +39,6 @@ class CsrfControllerTests {
 		mockMvc.perform(post("/api/v1/auth/login")
 				.cookie(csrfCookie)
 				.header("X-XSRF-TOKEN", csrfCookie.getValue()))
-				.andExpect(status().isNotFound());
+				.andExpect(status().isBadRequest());
 	}
 }

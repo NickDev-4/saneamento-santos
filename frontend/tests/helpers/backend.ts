@@ -22,6 +22,7 @@ export async function backend(page: Page, role: Role | null = 'CIDADAO') {
   const notices = structuredClone(noticeFixtures);
   const counts = new Map<string, number>();
   const failures = new Map<string, { status: number; message: string }>();
+  const csrfToken = 'test-csrf-token';
   function project(raw: Case, publicView = false) {
     const item = structuredClone(raw);
     item.acoesPermitidas =
@@ -44,6 +45,17 @@ export async function backend(page: Page, role: Role | null = 'CIDADAO') {
     const json = (data: unknown) => route.fulfill({ json: data });
     const empty = () => route.fulfill({ status: 204 });
     const paged = (items: unknown[]) => json({ items, totalPages: 1 });
+    if (path === '/auth/csrf')
+      return route.fulfill({
+        status: 204,
+        headers: { 'Set-Cookie': `XSRF-TOKEN=${csrfToken}; Path=/; SameSite=Lax` },
+      });
+    if (
+      !['GET', 'HEAD', 'OPTIONS'].includes(request.method()) &&
+      (!request.headers().cookie?.includes(`XSRF-TOKEN=${csrfToken}`) ||
+        request.headers()['x-xsrf-token'] !== csrfToken)
+    )
+      return route.fulfill({ status: 403, json: { message: 'Token CSRF inválido' } });
     if (path === '/auth/me') return user ? json(user) : route.fulfill({ status: 401, json: {} });
     if (path === '/auth/login') {
       const input = request.postDataJSON();
