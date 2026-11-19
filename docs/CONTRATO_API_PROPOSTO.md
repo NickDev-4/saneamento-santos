@@ -6,6 +6,8 @@ Decisões de produto: [PLANO_FRONTEND.md](PLANO_FRONTEND.md). Todos os endpoints
 
 Implementação do gerenciamento de estado e instruções de conexão: [FLUXO_DADOS_FRONTEND.md](FLUXO_DADOS_FRONTEND.md).
 
+Ordem de entrega, pipelines funcionais, autorização e inventário consolidado de rotas: [PLANO_IMPLEMENTACAO_BACKEND.md](PLANO_IMPLEMENTACAO_BACKEND.md). O plano complementa esta proposta, incluindo bootstrap CSRF e entrega autorizada de imagens.
+
 ## 1. Convenções propostas
 
 | Item | Proposta |

@@ -54,6 +54,17 @@ O proxy de desenvolvimento encaminha `/api` para `http://127.0.0.1:8080`. A API 
 
 O mapa usa Leaflet e os tiles configurados em `VITE_MAP_TILE_URL`. Sua exibição depende de acesso à internet e da disponibilidade do serviço de mapas.
 
+## Backend Java
+
+O backend usa Java 17, Spring Boot e MongoDB. Configure a URI e o banco localmente em `backend/.env` (esse arquivo é ignorado pelo Git; nunca versione credenciais) e inicie a API:
+
+```powershell
+cd .\backend
+.\gradlew.bat bootRun
+```
+
+A API fica em `http://127.0.0.1:8080`, como esperado pelo proxy do Vite. `GET /api/v1/health` verifica se a aplicação responde; validações de requisição usam o formato de erro definido em [CONTRATO_API_PROPOSTO.md](docs/CONTRATO_API_PROPOSTO.md). Execute `.\gradlew.bat test` para verificar o backend.
+
 ## Organização
 
 - `frontend/src/features/`: funcionalidades com páginas, componentes, hooks e contexts próprios.
@@ -75,5 +86,6 @@ O mapa usa Leaflet e os tiles configurados em `VITE_MAP_TILE_URL`. Sua exibiçã
 - [Fluxo de dados e Context API](docs/FLUXO_DADOS_FRONTEND.md)
 - [Arquitetura e organização dos arquivos](docs/ARQUITETURA_FRONTEND.md)
 - [Contrato de API proposto](docs/CONTRATO_API_PROPOSTO.md)
+- [Plano de implementação do backend, pipelines e rotas](docs/PLANO_IMPLEMENTACAO_BACKEND.md)
 
 Os registros, usuários e imagens ilustrativas da demonstração são fictícios. A existência de perfis institucionais no protótipo não representa adoção oficial pelas instituições.
