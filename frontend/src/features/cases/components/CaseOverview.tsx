@@ -1,5 +1,7 @@
 import type { Case } from '@/contracts';
+import { environment } from '@/config/environment';
 import type { CaseDetailController } from '@/features/cases/hooks/useCaseDetailPage';
+import { resolveApiImageUrl } from '@/services/http/image-url';
 import { date } from '@/shared/lib/date';
 import { ChevronRight, Clock3, ImageIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -11,7 +13,10 @@ export function CaseOverview({ c, setGalleryOpen }: Props) {
     <section className="content-card case-overview">
       <div className="detail-photo">
         <img
-          src={c.imagens[0]?.url || '/cenario-esgoto.svg'}
+          src={resolveApiImageUrl(
+            c.imagens[0]?.url || '/cenario-esgoto.svg',
+            environment.apiBaseUrl,
+          )}
           alt={
             c.imagens[0]?.ilustrativa
               ? 'Ilustração de um cenário fictício de extravasamento de esgoto'

@@ -6,7 +6,7 @@ Front-end de uma aplicação para registrar e acompanhar problemas de esgoto em 
 
 O front-end está implementado com React, TypeScript e Vite. O modo de demonstração usa dados fictícios em memória, permite conhecer os três perfis e dispensa um servidor Java. Os dados e a sessão da demonstração são reiniciados ao recarregar a página.
 
-O backend será desenvolvido separadamente em Java. Persistência, autenticação real, permissões, regras de negócio, uploads e operações de cadastro, consulta, atualização e exclusão serão responsabilidade dele. O adapter HTTP e os contratos do front-end servem como base para alinhar essa integração; o contrato de API ainda é uma proposta.
+O backend Java/Spring já tem a fundação segura, identidade, consultas públicas, CEP e a entrega de abertura e acompanhamento de chamados, incluindo upload de imagens. Para habilitar gravações reais, configure o GeoJSON oficial da área atendida em `SANTOS_SERVICE_AREA_GEOJSON` e provisione os tipos ativos na coleção do MongoDB. O storage local de imagens requer volume persistente em produção. O adapter HTTP e os contratos do front-end servem como base para alinhar a integração; o contrato de API ainda é uma proposta.
 
 ## Executar no Windows
 
@@ -64,6 +64,8 @@ cd .\backend
 ```
 
 A API fica em `http://127.0.0.1:8080`, como esperado pelo proxy do Vite. `GET /api/v1/health` verifica se a aplicação responde; validações de requisição usam o formato de erro definido em [CONTRATO_API_PROPOSTO.md](docs/CONTRATO_API_PROPOSTO.md). Execute `.\gradlew.bat test` para verificar o backend.
+
+Uploads usam arquivos com nomes opacos e armazenamento em filesystem local, configurável por `FILES_STORAGE_DIRECTORY` (padrão `./uploads`). Em produção, esse diretório precisa ser persistente e compartilhado entre instâncias; não use disco efêmero. O cadastro de chamados exige o polígono oficial da área em GeoJSON, configurado por `SANTOS_SERVICE_AREA_GEOJSON`. Sem esse arquivo, a criação/edição retorna `503 SERVICE_AREA_UNAVAILABLE` em vez de aceitar coordenadas sem validação geográfica. Os tipos de chamado também precisam ser provisionados no catálogo MongoDB.
 
 ## Organização
 

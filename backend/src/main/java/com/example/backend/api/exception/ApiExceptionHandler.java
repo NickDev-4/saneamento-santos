@@ -1,6 +1,8 @@
 package com.example.backend.api.exception;
 
 import com.example.backend.api.dto.ApiErrorResponse;
+import com.example.backend.application.cases.ImageStorageException;
+import com.example.backend.application.cases.ServiceAreaUnavailableException;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -14,6 +16,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
@@ -52,6 +56,39 @@ public class ApiExceptionHandler {
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	public ResponseEntity<ApiErrorResponse> handleUnreadableRequest(HttpMessageNotReadableException exception) {
 		return validationError(Map.of());
+	}
+
+	@ExceptionHandler(MissingServletRequestPartException.class)
+	public ResponseEntity<ApiErrorResponse> handleMissingMultipartPart(MissingServletRequestPartException exception) {
+		return validationError(Map.of(exception.getRequestPartName(), "Esta parte do formulário é obrigatória."));
+	}
+
+	@ExceptionHandler(MaxUploadSizeExceededException.class)
+	public ResponseEntity<ApiErrorResponse> handleOversizedUpload(MaxUploadSizeExceededException exception) {
+		ApiErrorResponse response = new ApiErrorResponse(
+				"FILE_TOO_LARGE",
+				"O envio excede o limite permitido.",
+				Map.of("imagens", "Cada imagem deve ter no máximo 5 MiB."));
+		return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(response);
+	}
+
+	@ExceptionHandler(ImageStorageException.class)
+	public ResponseEntity<ApiErrorResponse> handleImageStorageUnavailable(ImageStorageException exception) {
+		ApiErrorResponse response = new ApiErrorResponse(
+				"IMAGE_STORAGE_UNAVAILABLE",
+				"Não foi possível acessar o armazenamento de imagens.",
+				Map.of());
+		return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
+	}
+
+	@ExceptionHandler(ServiceAreaUnavailableException.class)
+	public ResponseEntity<ApiErrorResponse> handleServiceAreaUnavailable(
+			ServiceAreaUnavailableException exception) {
+		ApiErrorResponse response = new ApiErrorResponse(
+				"SERVICE_AREA_UNAVAILABLE",
+				"A área de atendimento não está configurada.",
+				Map.of());
+		return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
 	}
 
 	@ExceptionHandler(DataAccessResourceFailureException.class)

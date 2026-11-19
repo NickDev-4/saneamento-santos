@@ -1,5 +1,7 @@
 import type { Case } from '@/contracts';
+import { environment } from '@/config/environment';
 import type { CaseDetailController } from '@/features/cases/hooks/useCaseDetailPage';
+import { resolveApiImageUrl } from '@/services/http/image-url';
 import { Dialog } from '@/shared/ui/Dialog';
 
 type Props = Pick<CaseDetailController, 'setGalleryOpen'> & { c: Case };
@@ -11,7 +13,7 @@ export function CaseGalleryDialog({ c, setGalleryOpen }: Props) {
         {c.imagens.map((image, index) => (
           <figure key={image.id}>
             <img
-              src={image.url}
+              src={resolveApiImageUrl(image.url, environment.apiBaseUrl)}
               alt={
                 image.ilustrativa
                   ? 'Ilustração do cenário de teste'

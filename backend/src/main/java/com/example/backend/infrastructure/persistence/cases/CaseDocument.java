@@ -5,12 +5,14 @@ import com.example.backend.domain.cases.PublicationState;
 import java.time.Instant;
 import java.util.List;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document("cases")
 public record CaseDocument(
 		@Id String id,
-		String protocolo,
+		@Indexed(unique = true, name = "uq_cases_protocol") String protocolo,
 		String tipoId,
 		String tipo,
 		String descricao,
@@ -26,7 +28,8 @@ public record CaseDocument(
 		List<UpdateSnapshot> atualizacoes,
 		String autorId,
 		String reincidenciaDe,
-		String vinculoId) {
+		String vinculoId,
+		@Version Long version) {
 
 	public record AddressSnapshot(
 			String cep,
@@ -42,7 +45,12 @@ public record CaseDocument(
 	public record LocationSnapshot(double latitude, double longitude) {
 	}
 
-	public record ImageSnapshot(String id, String url, boolean ilustrativa, boolean aprovada) {
+	public record ImageSnapshot(
+			@Indexed(name = "idx_cases_image_id") String id,
+			String url,
+			String contentType,
+			boolean ilustrativa,
+			boolean aprovada) {
 	}
 
 	public record VisitWindow(Instant inicio, Instant fim) {

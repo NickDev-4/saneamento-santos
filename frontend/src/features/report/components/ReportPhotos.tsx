@@ -1,4 +1,6 @@
+import { environment } from '@/config/environment';
 import type { ReportFormController } from '@/features/report/hooks/useReportForm';
+import { resolveApiImageUrl } from '@/services/http/image-url';
 import { Camera, ImagePlus, X } from 'lucide-react';
 
 type Props = Pick<
@@ -57,7 +59,10 @@ export function ReportPhotos({ addFiles, errors, setKept, kept, setFiles, previe
       <div className="photo-previews">
         {kept.map((image, i) => (
           <div key={image.id}>
-            <img src={image.url} alt={`Imagem mantida ${i + 1}`} />
+            <img
+              src={resolveApiImageUrl(image.url, environment.apiBaseUrl)}
+              alt={`Imagem mantida ${i + 1}`}
+            />
             <button
               type="button"
               aria-label={`Remover imagem mantida ${i + 1}`}

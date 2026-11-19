@@ -97,7 +97,7 @@ CEP usa ViaCEP com timeouts e tratamento explícito de indisponibilidade. Não e
 | `PATCH /chamados/{id}` | Autor + CSRF | Editar dados/anexos somente enquanto `RECEBIDO`; validar novamente propriedade, estado e imagens preservadas. |
 | `POST /chamados/{id}/cancelamento` | Autor + CSRF | Cancelar somente o próprio chamado ainda `RECEBIDO`. |
 
-Na criação, o servidor determina autor, protocolo, datas, `status=RECEBIDO` e `publicacao=PENDENTE`. Rejeitar campos de sistema enviados pelo cliente. Validar `tipoId`, endereço, localização dentro da área definida, descrição, data observada e arquivos. Os limites iniciais do contrato são JPEG/PNG/WebP e até 5 MiB por arquivo; confirmar quantidade e configuração multipart no Spring.
+Na criação, o servidor determina autor, protocolo, datas, `status=RECEBIDO` e `publicacao=PENDENTE`. Rejeitar campos de sistema enviados pelo cliente. Validar `tipoId`, endereço em Santos/SP, localização dentro do polígono GeoJSON oficial, descrição, data observada e arquivos. Os limites são de uma a três imagens JPEG/PNG/WebP, até 5 MiB por arquivo e 16 MiB por requisição multipart.
 
 **Sequência:** CEP/geocodificação opcional → confirmação de localização pelo cidadão → `POST /chamados` → `GET /me/chamados` e `GET /chamados/{id}` para acompanhar. Alterações posteriores são recusadas com `409` se a triagem já começou. Não repetir automaticamente escrita após falha de rede.
 
@@ -143,7 +143,7 @@ Toda mutação verifica estado atual e permissão na mesma operação; conflito 
 | `GET /public/imagens/{id}` | Público | Servir somente imagem aprovada para publicação. |
 | `GET /imagens/{id}` | Autor do chamado ou Sabesp | Servir imagem privada após conferir autorização para o recurso associado. |
 
-Usar nomes internos opacos, metadados no Mongo e conteúdo em armazenamento de arquivos apropriado; nunca aceitar caminho arbitrário do cliente. Respostas públicas não podem incluir URL privada. Aplicar `Content-Type`, limites de cache e `X-Content-Type-Options: nosniff`.
+Usar UUIDs opacos, metadados no Mongo e conteúdo em armazenamento de arquivos; nunca aceitar caminho arbitrário do cliente. A implementação inicial usa filesystem configurável por `FILES_STORAGE_DIRECTORY` (padrão `./uploads`), que precisa de volume persistente/compartilhado em produção. A troca para armazenamento de objetos fica isolada pela interface de storage. O polígono oficial GeoJSON é indicado por `SANTOS_SERVICE_AREA_GEOJSON`; se não estiver configurado ou for inválido, a criação/edição retorna `503 SERVICE_AREA_UNAVAILABLE`. Respostas públicas não podem incluir URL privada. Aplicar `Content-Type`, limites de cache e `X-Content-Type-Options: nosniff`.
 
 ### Pipeline G — notificações e visão da Prefeitura
 
@@ -221,3 +221,5 @@ Commit 1 concluído: health em `/api/v1/health`, erros padronizados, sessão, CS
 Commit 2 entregue: cadastro de cidadão, login/logout de sessão, consulta/atualização do perfil, catálogo e consultas públicas paginadas, CEP via ViaCEP e bootstrap CSRF automático no cliente HTTP estão implementados. E-mails são normalizados e protegidos por índice único; senhas usam BCrypt e o hash não é guardado no principal da sessão.
 
 Recuperação de senha e geocodificação retornam `503` explicitamente até a configuração dos provedores; o catálogo retorna `[]` até que os tipos oficiais sejam provisionados. Chamados públicos só terão dados após a entrega de escrita/persistência do commit 3. Em produção, manter `MONGODB_AUTO_INDEX_CREATION=true` (padrão) ou provisionar o índice único `uq_users_email` antes de atender requisições.
+
+Commit 3 entregue: rotas de criação, listagem do cidadão, detalhe, edição e cancelamento; controle otimista de concorrência; validação multipart e storage local configurável; entrega de imagens privadas/públicas com verificação de propriedade/publicação. Para habilitar gravações reais, ainda é necessário fornecer o GeoJSON oficial em `SANTOS_SERVICE_AREA_GEOJSON` e provisionar os tipos ativos no MongoDB. O storage local requer volume persistente em produção.

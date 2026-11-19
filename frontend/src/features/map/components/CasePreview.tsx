@@ -1,7 +1,9 @@
 import type { Case } from '@/contracts';
+import { environment } from '@/config/environment';
 import { StatusBadge } from '@/features/cases/components/StatusBadge';
 import { VisitWindow } from '@/features/cases/components/VisitWindow';
 import { address } from '@/features/cases/lib/address';
+import { resolveApiImageUrl } from '@/services/http/image-url';
 import { ArrowRight, MapPin, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -16,7 +18,10 @@ export function CasePreview({ item, onClose }: { item: Case; onClose: () => void
       </div>
       <div className="preview-image">
         <img
-          src={item.imagens[0]?.url || '/cenario-esgoto.svg'}
+          src={resolveApiImageUrl(
+            item.imagens[0]?.url || '/cenario-esgoto.svg',
+            environment.apiBaseUrl,
+          )}
           alt={
             item.imagens[0]?.ilustrativa
               ? 'Ilustração do cenário fictício de esgoto'

@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
 public class PublicCaseQueryService {
 
 	private static final ZoneId APPLICATION_ZONE = ZoneId.of("America/Sao_Paulo");
-	private static final List<CaseStatus> HIDDEN_STATUSES = List.of(CaseStatus.CANCELADO, CaseStatus.VINCULADO);
 	private final MongoTemplate mongoTemplate;
 	private final CaseRepository caseRepository;
 
@@ -49,7 +48,7 @@ public class PublicCaseQueryService {
 		validatePage(page, size);
 		List<Criteria> filters = new ArrayList<>();
 		filters.add(Criteria.where("publicacao").is(PublicationState.APROVADO));
-		filters.add(Criteria.where("status").nin(HIDDEN_STATUSES));
+		filters.add(Criteria.where("status").nin(CasePublicVisibility.hiddenStatuses()));
 
 		if (status != null && !status.isBlank()) {
 			try {
@@ -86,7 +85,7 @@ public class PublicCaseQueryService {
 	}
 
 	private boolean isPublic(CaseDocument item) {
-		return item.publicacao() == PublicationState.APROVADO && !HIDDEN_STATUSES.contains(item.status());
+		return CasePublicVisibility.isPublic(item);
 	}
 
 	private void validatePage(int page, int size) {

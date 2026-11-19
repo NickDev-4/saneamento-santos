@@ -36,7 +36,10 @@ public record PublicCaseResponse(
 		List<ImageResponse> images = Objects.requireNonNullElse(item.imagens(), List.<CaseDocument.ImageSnapshot>of())
 				.stream()
 				.filter(CaseDocument.ImageSnapshot::aprovada)
-				.map(image -> new ImageResponse(image.id(), image.url(), image.ilustrativa()))
+				.map(image -> new ImageResponse(
+						image.id(),
+						"/api/v1/public/imagens/" + image.id(),
+						image.ilustrativa()))
 				.toList();
 		List<UpdateResponse> updates = Objects.requireNonNullElse(item.atualizacoes(),
 						List.<CaseDocument.UpdateSnapshot>of())
