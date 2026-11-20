@@ -5,6 +5,7 @@ import com.example.backend.api.cases.CitizenCaseResponse;
 import com.example.backend.api.auth.dto.UserResponse;
 import com.example.backend.api.exception.ApiException;
 import com.example.backend.api.publicapi.PageResponse;
+import com.example.backend.application.publicapi.CasePublicVisibility;
 import com.example.backend.domain.cases.CaseStatus;
 import com.example.backend.domain.cases.PublicationState;
 import com.example.backend.domain.user.UserRole;
@@ -19,6 +20,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -89,10 +91,23 @@ public class CitizenCaseService {
 		long total = mongoTemplate.count(new Query(criteria), CaseDocument.class);
 		Sort sort = Sort.by(Sort.Direction.DESC, "criadoEm").and(Sort.by(Sort.Direction.ASC, "id"));
 		PageRequest pageable = PageRequest.of(page, size, sort);
-		List<CitizenCaseResponse> items = mongoTemplate
-				.find(new Query(criteria).with(pageable), CaseDocument.class)
-				.stream()
-				.map(item -> CitizenCaseResponse.from(item, true, null))
+		List<CaseDocument> documents = mongoTemplate
+				.find(new Query(criteria).with(pageable), CaseDocument.class);
+		Set<String> linkedIds = documents.stream()
+				.map(CaseDocument::vinculoId)
+				.filter(id -> id != null && !id.isBlank())
+				.collect(java.util.stream.Collectors.toSet());
+		Map<String, CaseDocument> linkedCases = new HashMap<>();
+		if (!linkedIds.isEmpty()) {
+			caseRepository.findAllById(linkedIds).forEach(item -> linkedCases.put(item.id(), item));
+		}
+		List<CitizenCaseResponse> items = documents.stream()
+				.map(item -> CitizenCaseResponse.from(
+						item,
+						true,
+						true,
+						null,
+						linkedCaseSummary(linkedCases.get(item.vinculoId()))))
 				.toList();
 		int totalPages = total == 0 ? 0 : (int) Math.ceil((double) total / size);
 		return new PageResponse<>(items, page, size, total, totalPages);
@@ -111,7 +126,15 @@ public class CitizenCaseService {
 								HttpStatus.SERVICE_UNAVAILABLE,
 								"AUTHOR_PROFILE_UNAVAILABLE",
 								"Não foi possível carregar os dados do solicitante."));
-		return CitizenCaseResponse.from(item, owner, author);
+		CaseDocument linkedCase = item.vinculoId() == null
+				? null
+				: caseRepository.findById(item.vinculoId()).orElse(null);
+		return CitizenCaseResponse.from(
+				item,
+				owner,
+				owner || principal.perfil() == UserRole.SABESP,
+				author,
+				linkedCaseSummary(linkedCase));
 	}
 
 	public CitizenCaseResponse create(
@@ -135,6 +158,7 @@ public class CitizenCaseService {
 				data.location(),
 				CaseStatus.RECEBIDO,
 				PublicationState.PENDENTE,
+				null,
 				uploaded,
 				null,
 				List.of(new CaseDocument.UpdateSnapshot(
@@ -142,7 +166,8 @@ public class CitizenCaseService {
 						"Seu relato aguarda validação da equipe.",
 						now,
 						"Chamado recebido",
-						true)),
+						true,
+						principal.id())),
 				principal.id(),
 				data.recurrenceId(),
 				null,
@@ -186,7 +211,8 @@ public class CitizenCaseService {
 				current,
 				"Chamado atualizado",
 				"Dados do chamado atualizados pelo solicitante.",
-				now);
+				now,
+				principal.id());
 		CaseDocument updated = new CaseDocument(
 				current.id(),
 				current.protocolo(),
@@ -200,6 +226,7 @@ public class CitizenCaseService {
 				data.location(),
 				current.status(),
 				current.publicacao(),
+				current.revisaoPublicacao(),
 				List.copyOf(combinedImages),
 				current.previsaoVisita(),
 				updates,
@@ -240,9 +267,10 @@ public class CitizenCaseService {
 				current.localizacao(),
 				CaseStatus.CANCELADO,
 				current.publicacao(),
+				current.revisaoPublicacao(),
 				safeImages(current),
 				current.previsaoVisita(),
-				appendUpdate(current, "Chamado cancelado", "Registro cancelado pelo autor.", now),
+				appendUpdate(current, "Chamado cancelado", "Registro cancelado pelo autor.", now, principal.id()),
 				current.autorId(),
 				current.reincidenciaDe(),
 				current.vinculoId(),
@@ -322,7 +350,8 @@ public class CitizenCaseService {
 			CaseDocument current,
 			String title,
 			String text,
-			Instant createdAt) {
+			Instant createdAt,
+			String authorId) {
 		List<CaseDocument.UpdateSnapshot> updates = new ArrayList<>();
 		if (current.atualizacoes() != null) {
 			updates.addAll(current.atualizacoes());
@@ -332,7 +361,8 @@ public class CitizenCaseService {
 				text,
 				createdAt,
 				title,
-				true));
+				true,
+				authorId));
 		return List.copyOf(updates);
 	}
 
@@ -358,6 +388,20 @@ public class CitizenCaseService {
 						HttpStatus.UNAUTHORIZED,
 						"SESSION_EXPIRED",
 						"Sessão inválida ou expirada."));
+	}
+
+	private CitizenCaseResponse.LinkedCaseSummary linkedCaseSummary(CaseDocument linkedCase) {
+		if (linkedCase == null) {
+			return null;
+		}
+		String publicUrl = CasePublicVisibility.isPublic(linkedCase)
+				? "/api/v1/public/chamados/" + linkedCase.id()
+				: null;
+		return new CitizenCaseResponse.LinkedCaseSummary(
+				linkedCase.protocolo(),
+				linkedCase.status(),
+				linkedCase.previsaoVisita(),
+				publicUrl);
 	}
 
 	private String newProtocol() {

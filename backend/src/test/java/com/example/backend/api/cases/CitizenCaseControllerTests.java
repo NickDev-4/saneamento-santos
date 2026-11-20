@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -15,6 +16,11 @@ import com.example.backend.domain.cases.CaseStatus;
 import com.example.backend.domain.cases.PublicationState;
 import com.example.backend.domain.user.UserRole;
 import com.example.backend.application.cases.CitizenCaseService;
+import com.example.backend.application.cases.StaffCaseWorkflowService;
+import com.example.backend.application.indicators.CaseIndicatorsService;
+import com.example.backend.application.notifications.NotificationService;
+import com.example.backend.api.indicators.CaseIndicatorsResponse;
+import com.example.backend.api.publicapi.PageResponse;
 import com.example.backend.infrastructure.persistence.user.UserAccount;
 import com.example.backend.infrastructure.persistence.user.UserAccountRepository;
 import com.example.backend.security.UserPrincipal;
@@ -33,6 +39,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import static org.mockito.ArgumentMatchers.eq;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -49,6 +56,15 @@ class CitizenCaseControllerTests {
 
 	@MockitoBean
 	private CitizenCaseService cases;
+
+	@MockitoBean
+	private StaffCaseWorkflowService staffCases;
+
+	@MockitoBean
+	private NotificationService notifications;
+
+	@MockitoBean
+	private CaseIndicatorsService indicators;
 
 	@Test
 	void requiresCitizenSessionToListPrivateCases() throws Exception {
@@ -91,6 +107,8 @@ class CitizenCaseControllerTests {
 				List.of(),
 				null,
 				null,
+				null,
+				null,
 				List.of("editar", "cancelar"));
 		when(cases.create(any(CaseWriteRequest.class), anyList(), any(UserPrincipal.class))).thenReturn(created);
 
@@ -121,6 +139,48 @@ class CitizenCaseControllerTests {
 				.cookie(csrf)
 				.header("X-XSRF-TOKEN", csrf.getValue()))
 				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	void staffQueueRequiresSabespAndMutationsRequireCsrf() throws Exception {
+		MockHttpSession citizen = login(UserRole.CIDADAO);
+		mockMvc.perform(get("/api/v1/operacao/chamados").session(citizen))
+				.andExpect(status().isForbidden());
+
+		MockHttpSession sabesp = login(UserRole.SABESP);
+		when(staffCases.listOperational(null, null, null, null, null, 0, 20))
+				.thenReturn(new PageResponse<>(List.of(), 0, 20, 0, 0));
+		mockMvc.perform(get("/api/v1/operacao/chamados").session(sabesp))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.items").isArray());
+		mockMvc.perform(patch("/api/v1/chamados/case-id/publicacao")
+				.session(sabesp)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"publicacao\":\"APROVADO\"}"))
+				.andExpect(status().isForbidden());
+	}
+
+	@Test
+	void notificationsAreCitizenOnlyAndIndicatorsArePrefeituraOnly() throws Exception {
+		MockHttpSession citizen = login(UserRole.CIDADAO);
+		when(notifications.list(any(UserPrincipal.class), eq(0), eq(20)))
+				.thenReturn(new PageResponse<>(List.of(), 0, 20, 0, 0));
+		mockMvc.perform(get("/api/v1/me/notificacoes").session(citizen))
+				.andExpect(status().isOk());
+
+		MockHttpSession sabesp = login(UserRole.SABESP);
+		mockMvc.perform(get("/api/v1/me/notificacoes").session(sabesp))
+				.andExpect(status().isForbidden());
+
+		MockHttpSession prefeitura = login(UserRole.PREFEITURA);
+		when(indicators.summarize(null, null, null, null, null))
+				.thenReturn(new CaseIndicatorsResponse(
+						Instant.now(), 0, 0, 0, 0, 0, 0, List.of(), List.of(), List.of()));
+		mockMvc.perform(get("/api/v1/prefeitura/indicadores").session(prefeitura))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.totalAtendimentos").value(0));
+		mockMvc.perform(get("/api/v1/operacao/chamados").session(prefeitura))
+				.andExpect(status().isForbidden());
 	}
 
 	private MockHttpSession login(UserRole role) throws Exception {

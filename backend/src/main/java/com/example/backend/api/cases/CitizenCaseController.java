@@ -4,6 +4,8 @@ import com.example.backend.api.publicapi.PageResponse;
 import com.example.backend.application.cases.CitizenCaseService;
 import com.example.backend.security.UserPrincipal;
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1")
+@Tag(name = "Chamados do cidadão")
+@SecurityRequirement(name = "sessionCookie")
 public class CitizenCaseController {
 
 	private final CitizenCaseService cases;
@@ -45,6 +49,7 @@ public class CitizenCaseController {
 	}
 
 	@PostMapping(value = "/chamados", consumes = "multipart/form-data")
+	@SecurityRequirement(name = "csrfHeader")
 	@PreAuthorize("hasRole('CIDADAO')")
 	public ResponseEntity<CitizenCaseResponse> create(
 			@Valid @RequestPart("dados") CaseWriteRequest request,
@@ -65,6 +70,7 @@ public class CitizenCaseController {
 	}
 
 	@PatchMapping(value = "/chamados/{id}", consumes = "multipart/form-data")
+	@SecurityRequirement(name = "csrfHeader")
 	@PreAuthorize("hasRole('CIDADAO')")
 	public CitizenCaseResponse edit(
 			@PathVariable String id,
@@ -76,6 +82,7 @@ public class CitizenCaseController {
 	}
 
 	@PostMapping("/chamados/{id}/cancelamento")
+	@SecurityRequirement(name = "csrfHeader")
 	@PreAuthorize("hasRole('CIDADAO')")
 	public ResponseEntity<Void> cancel(
 			@PathVariable String id,

@@ -81,7 +81,7 @@ class PublicCaseQueryServiceTests {
 	void neverReturnsLinkedCasesFromPublicDetail() {
 		CaseDocument linked = new CaseDocument(
 				"case-id", "SS-1", "type-id", "Tipo", "Descrição", Instant.now(), Instant.now(), Instant.now(),
-				null, null, CaseStatus.VINCULADO, PublicationState.APROVADO, List.of(), null, List.of(),
+				null, null, CaseStatus.VINCULADO, PublicationState.APROVADO, null, List.of(), null, List.of(),
 				"author-id", null, "main-id", null);
 		when(caseRepository.findById("case-id")).thenReturn(Optional.of(linked));
 
@@ -95,14 +95,14 @@ class PublicCaseQueryServiceTests {
 	void publicResponseExcludesUnapprovedImagesAndPrivateUpdates() {
 		CaseDocument item = new CaseDocument(
 				"case-id", "SS-1", "type-id", "Tipo", "Descrição", Instant.now(), Instant.now(), Instant.now(),
-				null, null, CaseStatus.RESOLVIDO, PublicationState.APROVADO,
+				null, null, CaseStatus.RESOLVIDO, PublicationState.APROVADO, null,
 				List.of(
 						new CaseDocument.ImageSnapshot("public-id", "/public/image", "image/png", false, true),
 						new CaseDocument.ImageSnapshot("private-id", "/private/image", "image/png", false, false)),
 				null,
 				List.of(
-						new CaseDocument.UpdateSnapshot("public-update", "Público", Instant.now(), null, true),
-						new CaseDocument.UpdateSnapshot("private-update", "Interno", Instant.now(), null, false)),
+						new CaseDocument.UpdateSnapshot("public-update", "Público", Instant.now(), null, true, null),
+						new CaseDocument.UpdateSnapshot("private-update", "Interno", Instant.now(), null, false, null)),
 				"author-id", null, null, null);
 
 		var response = com.example.backend.api.publicapi.PublicCaseResponse.from(item);

@@ -3,6 +3,8 @@ package com.example.backend.api.cases;
 import com.example.backend.application.cases.CaseImageService;
 import com.example.backend.application.cases.CaseImageService.ImageContent;
 import com.example.backend.security.UserPrincipal;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.Duration;
 import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1")
+@Tag(name = "Imagens de chamados")
 public class CaseImageController {
 
 	private final CaseImageService images;
@@ -26,6 +29,7 @@ public class CaseImageController {
 
 	@GetMapping("/imagens/{id}")
 	@PreAuthorize("hasAnyRole('CIDADAO', 'SABESP')")
+	@SecurityRequirement(name = "sessionCookie")
 	public ResponseEntity<byte[]> privateImage(
 			@PathVariable String id,
 			@AuthenticationPrincipal UserPrincipal principal) {

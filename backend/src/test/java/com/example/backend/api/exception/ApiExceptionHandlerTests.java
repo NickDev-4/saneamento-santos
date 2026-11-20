@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.example.backend.api.dto.ApiErrorResponse;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.mongodb.MongoTransactionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
@@ -26,5 +27,14 @@ class ApiExceptionHandlerTests {
 		assertEquals("VALIDATION_ERROR", body.code());
 		assertEquals("Revise os campos indicados.", body.message());
 		assertEquals("Informe uma descrição.", body.fieldErrors().get("descricao"));
+	}
+
+	@Test
+	void reportsUnsupportedMongoTransactionsExplicitly() {
+		var response = exceptionHandler.handleTransactionUnavailable(
+				new MongoTransactionException("transactions unsupported"));
+
+		assertEquals(HttpStatus.SERVICE_UNAVAILABLE, response.getStatusCode());
+		assertEquals("WORKFLOW_TRANSACTION_UNAVAILABLE", response.getBody().code());
 	}
 }

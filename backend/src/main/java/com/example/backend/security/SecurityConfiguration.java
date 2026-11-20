@@ -84,6 +84,8 @@ public class SecurityConfiguration {
 						.requestMatchers("/api/v1/public/**", "/api/v1/enderecos/cep/**",
 								"/api/v1/enderecos/geocodificacao")
 						.permitAll()
+						.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
+						.permitAll()
 						.anyRequest().authenticated())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
 				.exceptionHandling(exceptions -> exceptions

@@ -113,6 +113,7 @@ class CaseImageServiceTests {
 				null,
 				status,
 				publication,
+				null,
 				List.of(new CaseDocument.ImageSnapshot(imageId, "/api/v1/imagens/" + imageId,
 						"image/png", false, approved)),
 				null,

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import org.springframework.dao.DataAccessResourceFailureException;
+import org.springframework.data.mongodb.MongoTransactionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -96,6 +97,15 @@ public class ApiExceptionHandler {
 		ApiErrorResponse response = new ApiErrorResponse(
 				"DATABASE_UNAVAILABLE",
 				"Serviço temporariamente indisponível.",
+				Map.of());
+		return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
+	}
+
+	@ExceptionHandler(MongoTransactionException.class)
+	public ResponseEntity<ApiErrorResponse> handleTransactionUnavailable(MongoTransactionException exception) {
+		ApiErrorResponse response = new ApiErrorResponse(
+				"WORKFLOW_TRANSACTION_UNAVAILABLE",
+				"Não foi possível concluir a operação com segurança. Verifique se o MongoDB suporta transações.",
 				Map.of());
 		return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
 	}

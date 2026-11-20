@@ -37,4 +37,11 @@ class SecurityConfigurationTests {
 				.andExpect(status().isForbidden())
 				.andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
 	}
+
+	@Test
+	void publishesOpenApiDocumentWithoutAuthentication() throws Exception {
+		mockMvc.perform(get("/v3/api-docs"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.info.title").value("API Saneamento Santos"));
+	}
 }

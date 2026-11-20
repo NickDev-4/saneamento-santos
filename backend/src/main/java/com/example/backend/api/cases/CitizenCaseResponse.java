@@ -25,6 +25,8 @@ public record CitizenCaseResponse(
 		CaseDocument.VisitWindow previsaoVisita,
 		List<UpdateResponse> atualizacoes,
 		String reincidenciaDe,
+		LinkedCaseSummary vinculo,
+		String motivoPublicacao,
 		UserResponse autor,
 		List<String> acoesPermitidas) {
 
@@ -35,6 +37,23 @@ public record CitizenCaseResponse(
 	}
 
 	public static CitizenCaseResponse from(CaseDocument item, boolean owner, UserResponse author) {
+		return from(item, owner, owner, author);
+	}
+
+	public static CitizenCaseResponse from(
+			CaseDocument item,
+			boolean owner,
+			boolean includePrivateUpdates,
+			UserResponse author) {
+		return from(item, owner, includePrivateUpdates, author, null);
+	}
+
+	public static CitizenCaseResponse from(
+			CaseDocument item,
+			boolean owner,
+			boolean includePrivateUpdates,
+			UserResponse author,
+			LinkedCaseSummary linkedCase) {
 		List<ImageResponse> images = Objects.requireNonNullElse(item.imagens(), List.<CaseDocument.ImageSnapshot>of())
 				.stream()
 				.map(image -> new ImageResponse(image.id(), image.url(), image.ilustrativa()))
@@ -42,7 +61,7 @@ public record CitizenCaseResponse(
 		List<UpdateResponse> updates = Objects.requireNonNullElse(item.atualizacoes(),
 						List.<CaseDocument.UpdateSnapshot>of())
 				.stream()
-				.filter(CaseDocument.UpdateSnapshot::publicada)
+				.filter(update -> includePrivateUpdates || update.publicada())
 				.map(update -> new UpdateResponse(update.id(), update.texto(), update.criadoEm(), update.titulo()))
 				.toList();
 		List<String> actions = owner && item.status() == CaseStatus.RECEBIDO
@@ -65,6 +84,8 @@ public record CitizenCaseResponse(
 				item.previsaoVisita(),
 				updates,
 				item.reincidenciaDe(),
+				linkedCase,
+				item.revisaoPublicacao() == null ? null : item.revisaoPublicacao().justificativa(),
 				author,
 				actions);
 	}
@@ -73,5 +94,12 @@ public record CitizenCaseResponse(
 	}
 
 	public record UpdateResponse(String id, String texto, Instant criadoEm, String titulo) {
+	}
+
+	public record LinkedCaseSummary(
+			String protocolo,
+			CaseStatus status,
+			CaseDocument.VisitWindow previsaoVisita,
+			String detalhePublicoUrl) {
 	}
 }
