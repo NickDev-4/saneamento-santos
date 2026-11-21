@@ -3,7 +3,7 @@ import { environment } from '@/config/environment';
 import { StatusBadge } from '@/features/cases/components/StatusBadge';
 import { VisitWindow } from '@/features/cases/components/VisitWindow';
 import { address } from '@/features/cases/lib/address';
-import { resolveApiImageUrl } from '@/services/http/image-url';
+import { resolveApiImageUrl } from '@/shared/lib/image-url';
 import { ArrowRight, MapPin, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 

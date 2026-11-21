@@ -53,3 +53,30 @@ test('registro usa os contexts e envia JSON e imagem pelo adapter HTTP', async (
   expect(body).toContain('"tipoId":"extravasamento"');
   expect(body).toContain('"numero":"210"');
 });
+
+test('registro rejeita CEP retornado para outra cidade', async ({ page }) => {
+  await backend(page);
+  await page.route('**/api/v1/public/tipos-chamado', (route) =>
+    route.fulfill({ json: typeOptions }),
+  );
+  await page.route('**/api/v1/enderecos/cep/*', (route) =>
+    route.fulfill({
+      json: {
+        cep: '01310-100',
+        logradouro: 'Avenida Paulista',
+        bairro: 'Bela Vista',
+        cidade: 'São Paulo',
+        uf: 'SP',
+      },
+    }),
+  );
+
+  await page.goto('/registrar');
+  await page.getByLabel('CEP', { exact: true }).fill('01310-100');
+  await page.getByRole('button', { name: 'Buscar CEP', exact: true }).click();
+
+  await expect(page.getByRole('alert')).toHaveText(
+    'O atendimento deste projeto é para Santos. Confira o CEP.',
+  );
+  await expect(page.getByLabel('Rua ou avenida', { exact: true })).toHaveValue('');
+});

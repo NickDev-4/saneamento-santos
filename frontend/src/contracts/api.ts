@@ -11,6 +11,7 @@ export interface Api {
   signup(input: { nome: string; email: string; senha: string; telefone?: string }): Promise<User>;
   logout(): Promise<void>;
   recover(email: string): Promise<void>;
+  resetPassword(token: string, novaSenha: string): Promise<void>;
   updateProfile(input: Partial<User>): Promise<User>;
   list(scope: Scope, filters?: Filters): Promise<Case[]>;
   detail(id: string, scope: Scope): Promise<Case>;

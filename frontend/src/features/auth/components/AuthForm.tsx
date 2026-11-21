@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 type Props = Pick<
   AuthFormController,
   'showPassword' | 'setShowPassword' | 'error' | 'busy' | 'submit'
-> & { mode: 'login' | 'signup' | 'recover' };
+> & { mode: 'login' | 'signup' | 'recover' | 'reset' };
 
 export function AuthForm({ mode, showPassword, setShowPassword, error, busy, submit }: Props) {
   return (
@@ -18,16 +18,18 @@ export function AuthForm({ mode, showPassword, setShowPassword, error, busy, sub
           <input id="nome" name="nome" autoComplete="name" required minLength={2} />
         </Field>
       )}
-      <Field label="E-mail" htmlFor="email">
-        <input
-          id="email"
-          name="email"
-          type="email"
-          placeholder="voce@exemplo.com"
-          autoComplete="email"
-          required
-        />
-      </Field>
+      {mode !== 'reset' && (
+        <Field label="E-mail" htmlFor="email">
+          <input
+            id="email"
+            name="email"
+            type="email"
+            placeholder="voce@exemplo.com"
+            autoComplete="email"
+            required
+          />
+        </Field>
+      )}
       {mode !== 'recover' && (
         <PasswordField showPassword={showPassword} mode={mode} setShowPassword={setShowPassword} />
       )}
@@ -59,7 +61,9 @@ export function AuthForm({ mode, showPassword, setShowPassword, error, busy, sub
             ? 'Criar minha conta'
             : mode === 'recover'
               ? 'Solicitar recuperação'
-              : 'Entrar na conta'}
+              : mode === 'reset'
+                ? 'Salvar nova senha'
+                : 'Entrar na conta'}
         <ArrowRight size={18} />
       </Button>
     </form>

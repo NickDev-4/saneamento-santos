@@ -13,6 +13,7 @@ export interface Auth extends AuthState {
   signup(input: Parameters<Api['signup']>[0]): Promise<User>;
   logout(): Promise<void>;
   recover(email: string): Promise<void>;
+  resetPassword(token: string, novaSenha: string): Promise<void>;
   updateProfile(input: Pick<User, 'nome' | 'telefone'>): Promise<User>;
   retrySession(): Promise<void>;
   execute<T>(work: () => Promise<T>): Promise<T>;

@@ -98,7 +98,7 @@ Filtros da consulta pública: `status`, `tipoId`, `bairro`, `criadoDe`, `criadoA
 
 A lista tem paginação mesmo quando há filtro por área do mapa. Para representar todos os resultados de uma área, o cliente precisa percorrer as páginas ou o Java deve oferecer um recurso específico de pontos, com limites explícitos. Não apresentar uma página parcial como se fosse o total do mapa.
 
-As consultas de endereço retornam dados/sugestões. Quem confirma o ponto é o usuário; quem valida definitivamente a área de Santos é o Java. O provedor de geocodificação será escolhido pelo responsável pela integração, sem acoplar a interface a ele.
+As consultas de endereço retornam dados/sugestões. Quem confirma o ponto é o usuário; quem valida definitivamente a área de Santos é o Java. O backend usa Nominatim por padrão, com URL configurável, sem acoplar a interface ao provedor.
 
 ### Cidadão
 
@@ -267,7 +267,7 @@ Estes pontos são escolhas de implementação a acertar com o responsável pelo 
 
 1. Aceitar/ajustar rotas, enums, DTOs e formatos; publicar o contrato OpenAPI acordado.
 2. Confirmar autenticação, sessão, CSRF e origens de desenvolvimento.
-3. Definir catálogo de tipos, validação da área de Santos e provedor de geocodificação.
+3. Definir catálogo de tipos, confirmar a área de Santos e revisar política/volume do Nominatim para o ambiente de produção.
 4. Confirmar limites multipart, armazenamento e acesso às imagens privadas/públicas.
 5. Definir provisionamento das contas de teste e recuperação de acesso.
 6. Ajustar transições excepcionais e estratégia contra reenvios repetidos.

@@ -6,8 +6,14 @@ const json = (body: unknown) => JSON.stringify(body);
 
 export function createAuthService({
   request,
-}: HttpClient): Pick<Api, 'me' | 'login' | 'signup' | 'logout' | 'recover' | 'updateProfile'> {
-  const service: Pick<Api, 'me' | 'login' | 'signup' | 'logout' | 'recover' | 'updateProfile'> = {
+}: HttpClient): Pick<
+  Api,
+  'me' | 'login' | 'signup' | 'logout' | 'recover' | 'resetPassword' | 'updateProfile'
+> {
+  const service: Pick<
+    Api,
+    'me' | 'login' | 'signup' | 'logout' | 'recover' | 'resetPassword' | 'updateProfile'
+  > = {
     async me() {
       try {
         return await request<User>('/auth/me');
@@ -27,6 +33,8 @@ export function createAuthService({
     },
     logout: () => request('/auth/logout', { method: 'POST' }),
     recover: (email) => request('/auth/recuperacao', { method: 'POST', body: json({ email }) }),
+    resetPassword: (token, novaSenha) =>
+      request('/auth/redefinicao', { method: 'POST', body: json({ token, novaSenha }) }),
     updateProfile: (input) =>
       request('/me', {
         method: 'PATCH',

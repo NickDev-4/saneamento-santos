@@ -4,7 +4,7 @@ import type { DemoContext } from '@/services/demo/context';
 
 export function createDemoAuthService(
   context: DemoContext,
-): Pick<Api, 'me' | 'login' | 'signup' | 'logout' | 'recover' | 'updateProfile'> {
+): Pick<Api, 'me' | 'login' | 'signup' | 'logout' | 'recover' | 'resetPassword' | 'updateProfile'> {
   const { pause, copy, uid, requireUser } = context;
   return {
     async me() {
@@ -31,6 +31,9 @@ export function createDemoAuthService(
       context.session = null;
     },
     async recover() {
+      await pause();
+    },
+    async resetPassword() {
       await pause();
     },
     async updateProfile(input) {

@@ -1,5 +1,8 @@
 import type { Case } from '@/contracts';
 
 export function address(c: Case) {
-  return `${c.endereco.logradouro}${c.endereco.semNumero ? ', s/n' : `, ${c.endereco.numero}`}`;
+  if (c.endereco.semNumero) return `${c.endereco.logradouro}, s/n`;
+  return c.endereco.numero
+    ? `${c.endereco.logradouro}, ${c.endereco.numero}`
+    : c.endereco.logradouro;
 }

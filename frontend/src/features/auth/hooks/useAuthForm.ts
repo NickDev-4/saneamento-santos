@@ -5,8 +5,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 
-export function useAuthForm(mode: 'login' | 'signup' | 'recover') {
-  const { login, signup, recover } = useAuth();
+export function useAuthForm(mode: 'login' | 'signup' | 'recover' | 'reset') {
+  const { login, signup, recover, resetPassword } = useAuth();
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const [busy, setBusy] = useState(false);
@@ -27,6 +27,9 @@ export function useAuthForm(mode: 'login' | 'signup' | 'recover') {
       const senha = String(form.get('senha') || '');
       if (mode === 'recover') {
         await recover(email);
+        setSent(true);
+      } else if (mode === 'reset') {
+        await resetPassword(params.get('token') ?? '', String(form.get('senha') || ''));
         setSent(true);
       } else {
         const user =

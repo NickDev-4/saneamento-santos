@@ -8,5 +8,5 @@ public record ViaCepResponse(
 		String bairro,
 		@JsonProperty("localidade") String cidade,
 		String uf,
-		boolean erro) {
+		Boolean erro) {
 }

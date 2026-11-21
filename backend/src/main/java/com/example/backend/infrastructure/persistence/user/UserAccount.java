@@ -14,5 +14,21 @@ public record UserAccount(
 		String telefone,
 		String passwordHash,
 		UserRole perfil,
-		Instant criadoEm) {
+		Instant criadoEm,
+		Long passwordVersion) {
+
+	public UserAccount(
+			String id,
+			String email,
+			String nome,
+			String telefone,
+			String passwordHash,
+			UserRole perfil,
+			Instant criadoEm) {
+		this(id, email, nome, telefone, passwordHash, perfil, criadoEm, 0L);
+	}
+
+	public long effectivePasswordVersion() {
+		return passwordVersion == null ? 0L : passwordVersion;
+	}
 }

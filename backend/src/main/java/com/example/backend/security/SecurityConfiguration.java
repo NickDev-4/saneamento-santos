@@ -16,10 +16,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import com.example.backend.infrastructure.persistence.user.UserAccountRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -33,9 +35,13 @@ public class SecurityConfiguration {
 	private String sameSite;
 
 	private final ApiSecurityErrorHandler securityErrorHandler;
+	private final CredentialVersionFilter credentialVersionFilter;
 
-	public SecurityConfiguration(ApiSecurityErrorHandler securityErrorHandler) {
+	public SecurityConfiguration(
+			ApiSecurityErrorHandler securityErrorHandler,
+			UserAccountRepository accounts) {
 		this.securityErrorHandler = securityErrorHandler;
+		this.credentialVersionFilter = new CredentialVersionFilter(accounts);
 	}
 
 	@Bean
@@ -91,6 +97,7 @@ public class SecurityConfiguration {
 				.exceptionHandling(exceptions -> exceptions
 						.authenticationEntryPoint(securityErrorHandler)
 						.accessDeniedHandler(securityErrorHandler))
+				.addFilterAfter(credentialVersionFilter, SecurityContextHolderFilter.class)
 				.build();
 	}
 }

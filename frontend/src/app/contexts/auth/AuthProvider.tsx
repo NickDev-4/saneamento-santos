@@ -102,6 +102,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [api, execute, replaceSession]);
 
   const recover = useCallback((email: string) => api.recover(email), [api]);
+  const resetPassword = useCallback(
+    (token: string, novaSenha: string) => api.resetPassword(token, novaSenha),
+    [api],
+  );
   const updateProfile = useCallback(
     async (input: Pick<User, 'nome' | 'telefone'>) => {
       const startedIn = generation.current;
@@ -114,8 +118,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const value = useMemo(
-    () => ({ ...state, login, signup, logout, recover, updateProfile, retrySession, execute }),
-    [state, login, signup, logout, recover, updateProfile, retrySession, execute],
+    () => ({
+      ...state,
+      login,
+      signup,
+      logout,
+      recover,
+      resetPassword,
+      updateProfile,
+      retrySession,
+      execute,
+    }),
+    [state, login, signup, logout, recover, resetPassword, updateProfile, retrySession, execute],
   );
   return <AuthContext value={value}>{children}</AuthContext>;
 }

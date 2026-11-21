@@ -3,7 +3,7 @@ import { Field } from '@/shared/ui/Field';
 import { Eye, EyeOff } from 'lucide-react';
 
 type Props = Pick<AuthFormController, 'showPassword' | 'setShowPassword'> & {
-  mode: 'login' | 'signup' | 'recover';
+  mode: 'login' | 'signup' | 'recover' | 'reset';
 };
 
 export function PasswordField({ showPassword, mode, setShowPassword }: Props) {
@@ -11,16 +11,16 @@ export function PasswordField({ showPassword, mode, setShowPassword }: Props) {
     <Field
       label="Senha"
       htmlFor="senha"
-      hint={mode === 'signup' ? 'Use pelo menos 8 caracteres.' : undefined}
+      hint={mode === 'signup' || mode === 'reset' ? 'Use pelo menos 8 caracteres.' : undefined}
     >
       <div className="password-input">
         <input
           id="senha"
           name="senha"
           type={showPassword ? 'text' : 'password'}
-          autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+          autoComplete={mode === 'signup' || mode === 'reset' ? 'new-password' : 'current-password'}
           required
-          minLength={mode === 'signup' ? 8 : 1}
+          minLength={mode === 'signup' || mode === 'reset' ? 8 : 1}
         />
         <button
           type="button"

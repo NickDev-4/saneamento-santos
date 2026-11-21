@@ -18,6 +18,7 @@ import java.time.Instant;
 import java.util.Locale;
 import java.util.Map;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -36,16 +37,28 @@ public class AuthService {
 	private final PasswordEncoder passwordEncoder;
 	private final AuthenticationManager authenticationManager;
 	private final SecurityContextRepository securityContextRepository;
+	private final PasswordRecoveryService passwordRecovery;
+
+	@Autowired
+	public AuthService(
+			UserAccountRepository accounts,
+			PasswordEncoder passwordEncoder,
+			AuthenticationManager authenticationManager,
+			SecurityContextRepository securityContextRepository,
+			PasswordRecoveryService passwordRecovery) {
+		this.accounts = accounts;
+		this.passwordEncoder = passwordEncoder;
+		this.authenticationManager = authenticationManager;
+		this.securityContextRepository = securityContextRepository;
+		this.passwordRecovery = passwordRecovery;
+	}
 
 	public AuthService(
 			UserAccountRepository accounts,
 			PasswordEncoder passwordEncoder,
 			AuthenticationManager authenticationManager,
 			SecurityContextRepository securityContextRepository) {
-		this.accounts = accounts;
-		this.passwordEncoder = passwordEncoder;
-		this.authenticationManager = authenticationManager;
-		this.securityContextRepository = securityContextRepository;
+		this(accounts, passwordEncoder, authenticationManager, securityContextRepository, null);
 	}
 
 	public UserResponse register(SignupRequest request) {
@@ -62,7 +75,8 @@ public class AuthService {
 				normalizeOptional(request.telefone()),
 				passwordEncoder.encode(request.senha()),
 				UserRole.CIDADAO,
-				Instant.now());
+				Instant.now(),
+				0L);
 		try {
 			return UserResponse.from(accounts.save(account));
 		} catch (DuplicateKeyException exception) {
@@ -127,7 +141,8 @@ public class AuthService {
 				request.telefone() == null ? account.telefone() : normalizeOptional(request.telefone()),
 				account.passwordHash(),
 				account.perfil(),
-				account.criadoEm());
+				account.criadoEm(),
+				account.effectivePasswordVersion());
 		return UserResponse.from(accounts.save(updated));
 	}
 
@@ -140,11 +155,17 @@ public class AuthService {
 	}
 
 	public void recover(RecoveryRequest request) {
-		throw recoveryUnavailable();
+		if (passwordRecovery == null) {
+			throw recoveryUnavailable();
+		}
+		passwordRecovery.requestRecovery(request);
 	}
 
 	public void resetPassword(PasswordResetRequest request) {
-		throw recoveryUnavailable();
+		if (passwordRecovery == null) {
+			throw recoveryUnavailable();
+		}
+		passwordRecovery.resetPassword(request);
 	}
 
 	private ApiException recoveryUnavailable() {

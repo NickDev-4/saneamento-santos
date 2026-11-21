@@ -1,5 +1,5 @@
 import { LoginPage } from '@/features/auth/pages/LoginPage';
-import { RecoverPasswordPage } from '@/features/auth/pages/RecoverPasswordPage';
+import { RecoverPasswordPage, ResetPasswordPage } from '@/features/auth/pages/RecoverPasswordPage';
 import { SignupPage } from '@/features/auth/pages/SignupPage';
 import { CaseDetailPage } from '@/features/cases/pages/CaseDetailPage';
 import { MapPage } from '@/features/map/pages/MapPage';
@@ -10,5 +10,6 @@ export const publicRoutes: RouteObject[] = [
   { path: '/entrar', element: <LoginPage /> },
   { path: '/cadastro', element: <SignupPage /> },
   { path: '/recuperar-senha', element: <RecoverPasswordPage /> },
+  { path: '/redefinir-senha', element: <ResetPasswordPage /> },
   { path: '/chamados/:id', element: <CaseDetailPage /> },
 ];

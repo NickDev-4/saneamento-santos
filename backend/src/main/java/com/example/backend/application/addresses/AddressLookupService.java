@@ -25,7 +25,7 @@ public class AddressLookupService {
 		if (result == null) {
 			throw new AddressProviderUnavailableException();
 		}
-		if (result.erro()) {
+		if (Boolean.TRUE.equals(result.erro())) {
 			throw new ApiException(HttpStatus.NOT_FOUND, "CEP_NOT_FOUND",
 					"CEP não encontrado.", Map.of("cep", "Confira o CEP ou preencha o endereço manualmente."));
 		}

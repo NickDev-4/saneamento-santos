@@ -90,8 +90,9 @@ export function createHttpClient(options: HttpClientOptions = {}): HttpClient {
         error.fieldErrors,
       );
     }
-    if (response.status === 204) return undefined as T;
-    return response.json();
+    if (response.status === 204 || response.status === 205) return undefined as T;
+    const body = await response.text();
+    return body ? (JSON.parse(body) as T) : (undefined as T);
   }
   async function pages<T>(path: string, filters?: Filters): Promise<T[]> {
     const q = query(filters);

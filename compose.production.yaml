@@ -1,0 +1,47 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      SPRING_MONGODB_URI: ${SPRING_MONGODB_URI:?Configure a MongoDB Atlas ou replica set externo}
+      SPRING_MONGODB_DATABASE: ${SPRING_MONGODB_DATABASE:-saneamento_santos}
+      MONGODB_AUTO_INDEX_CREATION: "true"
+      SERVER_PORT: "8080"
+      SESSION_COOKIE_SECURE: "true"
+      SESSION_COOKIE_SAME_SITE: lax
+      SANTOS_SERVICE_AREA_GEOJSON: /app/config/santos-service-area.geojson
+      FILES_STORAGE_DIRECTORY: /app/data/images
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USERNAME: ${SMTP_USERNAME:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_AUTH: ${SMTP_AUTH:-true}
+      SMTP_STARTTLS: ${SMTP_STARTTLS:-true}
+      RECOVERY_EMAIL_FROM: ${RECOVERY_EMAIL_FROM:-}
+      RECOVERY_FRONTEND_URL: ${RECOVERY_FRONTEND_URL:-}
+      RECOVERY_TOKEN_LIFETIME_MINUTES: ${RECOVERY_TOKEN_LIFETIME_MINUTES:-30}
+      CASE_TYPES_SEED_FILE: ${CASE_TYPES_SEED_FILE:-}
+      SEED_SABESP_EMAIL: ${SEED_SABESP_EMAIL:-}
+      SEED_SABESP_NAME: ${SEED_SABESP_NAME:-}
+      SEED_SABESP_PASSWORD: ${SEED_SABESP_PASSWORD:-}
+      SEED_PREFEITURA_EMAIL: ${SEED_PREFEITURA_EMAIL:-}
+      SEED_PREFEITURA_NAME: ${SEED_PREFEITURA_NAME:-}
+      SEED_PREFEITURA_PASSWORD: ${SEED_PREFEITURA_PASSWORD:-}
+    volumes:
+      - ./backend/data:/app/config:ro
+      - case-images:/app/data/images
+    expose:
+      - "8080"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "127.0.0.1:${APP_HTTP_PORT:-8088}:80"
+    depends_on:
+      - backend
+
+volumes:
+  case-images:

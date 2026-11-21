@@ -14,7 +14,12 @@ public record UserPrincipal(
 		String nome,
 		String telefone,
 		String passwordHash,
-		UserRole perfil) implements UserDetails, Serializable {
+		UserRole perfil,
+		long credentialVersion) implements UserDetails, Serializable {
+
+	public UserPrincipal(String id, String username, String nome, String telefone, String passwordHash, UserRole perfil) {
+		this(id, username, nome, telefone, passwordHash, perfil, 0L);
+	}
 
 	public static UserPrincipal from(com.example.backend.infrastructure.persistence.user.UserAccount account) {
 		return new UserPrincipal(
@@ -23,11 +28,12 @@ public record UserPrincipal(
 				account.nome(),
 				account.telefone(),
 				account.passwordHash(),
-				account.perfil());
+				account.perfil(),
+				account.effectivePasswordVersion());
 	}
 
 	public UserPrincipal withoutPassword() {
-		return new UserPrincipal(id, username, nome, telefone, null, perfil);
+		return new UserPrincipal(id, username, nome, telefone, null, perfil, credentialVersion);
 	}
 
 	@Override

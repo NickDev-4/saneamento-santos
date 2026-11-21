@@ -1,0 +1,17 @@
+[
+  {
+    "id": "extravasamento",
+    "nome": "Extravasamento de esgoto",
+    "ativo": true
+  },
+  {
+    "id": "retorno",
+    "nome": "Retorno de esgoto",
+    "ativo": true
+  },
+  {
+    "id": "odor",
+    "nome": "Odor forte",
+    "ativo": true
+  }
+]

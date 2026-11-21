@@ -8,17 +8,27 @@ import { BackLink } from '@/shared/ui/BackLink';
 import { Success } from '@/shared/ui/Success';
 import { Link } from 'react-router-dom';
 
-export function AuthPage({ mode }: { mode: 'login' | 'signup' | 'recover' }) {
+export function AuthPage({ mode }: { mode: 'login' | 'signup' | 'recover' | 'reset' }) {
   const { busy, error, showPassword, setShowPassword, sent, submit, demo } = useAuthForm(mode);
   if (sent)
     return (
       <div className="auth-layout">
         <Success
-          title={isDemo ? 'Confirmação de demonstração' : 'Confira seu e-mail'}
+          title={
+            mode === 'reset'
+              ? 'Senha atualizada'
+              : isDemo
+                ? 'Confirmação de demonstração'
+                : 'Confira seu e-mail'
+          }
           text={
             isDemo
-              ? 'Este é o estado de confirmação da recuperação de acesso. Nenhuma mensagem foi enviada nesta demonstração.'
-              : 'Se o e-mail estiver cadastrado, você receberá as instruções para recuperar o acesso.'
+              ? mode === 'reset'
+                ? 'A senha foi atualizada nesta demonstração.'
+                : 'Este é o estado de confirmação da recuperação de acesso. Nenhuma mensagem foi enviada nesta demonstração.'
+              : mode === 'reset'
+                ? 'Sua senha foi alterada. Entre com a nova senha.'
+                : 'Se o e-mail estiver cadastrado, você receberá as instruções para recuperar o acesso.'
           }
           to="/entrar"
           label="Voltar para o acesso"
