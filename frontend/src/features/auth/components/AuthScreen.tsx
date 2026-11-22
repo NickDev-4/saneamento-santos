@@ -3,7 +3,7 @@ import { AuthHeading } from '@/features/auth/components/AuthHeading';
 import { AuthStory } from '@/features/auth/components/AuthStory';
 import { DemoAccess } from '@/features/auth/components/DemoAccess';
 import { useAuthForm } from '@/features/auth/hooks/useAuthForm';
-import { isDemo } from '@/config/environment';
+import { environment, isDemo } from '@/config/environment';
 import { BackLink } from '@/shared/ui/BackLink';
 import { Success } from '@/shared/ui/Success';
 import { Link } from 'react-router-dom';
@@ -50,9 +50,15 @@ export function AuthPage({ mode }: { mode: 'login' | 'signup' | 'recover' }) {
         )}
         {isDemo && mode === 'login' && <DemoAccess busy={busy} demo={demo} />}
         {!isDemo && mode === 'login' && (
-          <p className="field-hint">
-            Equipe Sabesp e Prefeitura: utilize sua conta institucional previamente cadastrada.
-          </p>
+          <div className="field-hint">
+            Equipe Sabesp e Prefeitura: utilize sua conta previamente cadastrada.
+            {environment.showDemoAccounts && (
+              <p>
+                Acessos fictícios: demo-cidadao@saneamento.test, demo-sabesp@saneamento.test ou
+                demo-prefeitura@saneamento.test. Senha: SantosDemo2026!
+              </p>
+            )}
+          </div>
         )}
       </div>
     </div>

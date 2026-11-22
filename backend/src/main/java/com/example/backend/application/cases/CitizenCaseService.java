@@ -129,12 +129,18 @@ public class CitizenCaseService {
 		CaseDocument linkedCase = item.vinculoId() == null
 				? null
 				: caseRepository.findById(item.vinculoId()).orElse(null);
+		List<String> actions = principal.perfil() == UserRole.SABESP
+				? CitizenCaseResponse.staffActions(item)
+				: owner && item.status() == CaseStatus.RECEBIDO
+						? List.of("editar", "cancelar")
+						: List.of();
 		return CitizenCaseResponse.from(
 				item,
 				owner,
 				owner || principal.perfil() == UserRole.SABESP,
 				author,
-				linkedCaseSummary(linkedCase));
+				linkedCaseSummary(linkedCase),
+				actions);
 	}
 
 	public CitizenCaseResponse create(
@@ -398,6 +404,7 @@ public class CitizenCaseService {
 				? "/api/v1/public/chamados/" + linkedCase.id()
 				: null;
 		return new CitizenCaseResponse.LinkedCaseSummary(
+				linkedCase.id(),
 				linkedCase.protocolo(),
 				linkedCase.status(),
 				linkedCase.previsaoVisita(),

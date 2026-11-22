@@ -8,6 +8,8 @@ type Props = {} & { c: Case };
 
 export function LinkedCaseBanner({ c }: Props) {
   if (!c.vinculo) return null;
+  const linkedId =
+    c.vinculo.id ?? c.vinculo.detalhePublicoUrl?.split('/').filter(Boolean).at(-1);
   return (
     <div className="linked-banner">
       <Link2 size={24} />
@@ -19,10 +21,12 @@ export function LinkedCaseBanner({ c }: Props) {
         </p>
         <div className="linked-status">
           <StatusBadge status={c.vinculo.status} />
-          <Link to={`/chamados/${c.vinculo.id}`}>
-            Ver atendimento principal
-            <ArrowRight size={15} />
-          </Link>
+          {linkedId && (
+            <Link to={`/chamados/${linkedId}`}>
+              Ver atendimento principal
+              <ArrowRight size={15} />
+            </Link>
+          )}
         </div>
         <VisitWindow value={c.vinculo.previsaoVisita} compact />
       </div>

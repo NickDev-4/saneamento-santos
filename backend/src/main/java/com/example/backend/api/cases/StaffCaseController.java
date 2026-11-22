@@ -33,7 +33,7 @@ public class StaffCaseController {
 	}
 
 	@GetMapping("/operacao/chamados")
-	public PageResponse<OperationalCaseSummary> list(
+	public PageResponse<CitizenCaseResponse> list(
 			@RequestParam(required = false) String status,
 			@RequestParam(required = false) String tipoId,
 			@RequestParam(required = false) String bairro,

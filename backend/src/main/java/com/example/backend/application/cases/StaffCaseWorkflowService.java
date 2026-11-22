@@ -3,7 +3,6 @@ package com.example.backend.application.cases;
 import com.example.backend.api.cases.CaseLinkRequest;
 import com.example.backend.api.cases.CitizenCaseResponse;
 import com.example.backend.api.cases.InternalCaseNoteResponse;
-import com.example.backend.api.cases.OperationalCaseSummary;
 import com.example.backend.api.cases.PublicUpdateRequest;
 import com.example.backend.api.cases.PublicationRequest;
 import com.example.backend.api.cases.StatusTransitionRequest;
@@ -69,7 +68,7 @@ public class StaffCaseWorkflowService {
 		this.mongoTemplate = mongoTemplate;
 	}
 
-	public PageResponse<OperationalCaseSummary> listOperational(
+	public PageResponse<CitizenCaseResponse> listOperational(
 			String status,
 			String tipoId,
 			String bairro,
@@ -86,10 +85,16 @@ public class StaffCaseWorkflowService {
 				page,
 				size,
 				Sort.by(Sort.Direction.DESC, "criadoEm").and(Sort.by(Sort.Direction.ASC, "id")));
-		List<OperationalCaseSummary> items = mongoTemplate
+		List<CitizenCaseResponse> items = mongoTemplate
 				.find(new Query(criteria).with(pageable), CaseDocument.class)
 				.stream()
-				.map(OperationalCaseSummary::from)
+				.map(item -> CitizenCaseResponse.from(
+						item,
+						false,
+						true,
+						null,
+						null,
+						CitizenCaseResponse.staffActions(item)))
 				.toList();
 		return new PageResponse<>(items, page, size, total, totalPages(total, size));
 	}
@@ -514,13 +519,20 @@ public class StaffCaseWorkflowService {
 		CitizenCaseResponse.LinkedCaseSummary summary = linkedMain == null
 				? null
 				: new CitizenCaseResponse.LinkedCaseSummary(
+						linkedMain.id(),
 						linkedMain.protocolo(),
 						linkedMain.status(),
 						linkedMain.previsaoVisita(),
 						CasePublicVisibility.isPublic(linkedMain)
 								? "/api/v1/public/chamados/" + linkedMain.id()
 								: null);
-		return CitizenCaseResponse.from(item, false, true, null, summary);
+		return CitizenCaseResponse.from(
+				item,
+				false,
+				true,
+				null,
+				summary,
+				CitizenCaseResponse.staffActions(item));
 	}
 
 	private CaseDocument findCase(String id) {

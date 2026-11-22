@@ -1,6 +1,5 @@
 import { CaseTable } from '@/features/cases/components/CaseTable';
 import { StaffFilters } from '@/features/staff/components/StaffFilters';
-import { StaffOverview } from '@/features/staff/components/StaffOverview';
 import { useStaffQueue } from '@/features/staff/hooks/useStaffQueue';
 import { Button } from '@/shared/ui/Button';
 import { PageTitle } from '@/shared/ui/PageTitle';
@@ -9,7 +8,6 @@ import { RefreshCw } from 'lucide-react';
 
 export function StaffPage() {
   const {
-    data,
     loading,
     error,
     retry,
@@ -17,8 +15,6 @@ export function StaffPage() {
     setQuery,
     status,
     setStatus,
-    publication,
-    setPublication,
     list,
   } = useStaffQueue();
   return (
@@ -34,7 +30,6 @@ export function StaffPage() {
           </Button>
         }
       />
-      <StaffOverview data={data} />
       <section className="content-card institution-list">
         <div className="institution-list-heading">
           <div>
@@ -49,8 +44,6 @@ export function StaffPage() {
           setQuery={setQuery}
           status={status}
           setStatus={setStatus}
-          publication={publication}
-          setPublication={setPublication}
         />
         {loading || error ? (
           <State loading={loading} error={error} retry={retry} />

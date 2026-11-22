@@ -9,5 +9,7 @@ public interface CaseRepository extends MongoRepository<CaseDocument, String> {
 	@Query("{ 'imagens.id': ?0 }")
 	Optional<CaseDocument> findFirstByImageId(String imageId);
 
+	boolean existsByProtocolo(String protocolo);
+
 	List<CaseDocument> findByVinculoId(String vinculoId);
 }

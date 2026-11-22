@@ -9,24 +9,32 @@ import { Link } from 'react-router-dom';
 type Props = Pick<CaseDetailController, 'setGalleryOpen'> & { c: Case };
 
 export function CaseOverview({ c, setGalleryOpen }: Props) {
+  const firstImage = c.imagens[0];
   return (
     <section className="content-card case-overview">
       <div className="detail-photo">
         <img
           src={resolveApiImageUrl(
-            c.imagens[0]?.url || '/cenario-esgoto.svg',
+            firstImage?.url || '/cenario-esgoto.svg',
             environment.apiBaseUrl,
           )}
           alt={
-            c.imagens[0]?.ilustrativa
+            !firstImage || firstImage.ilustrativa
               ? 'Ilustração de um cenário fictício de extravasamento de esgoto'
               : 'Foto do problema relatado'
           }
         />
-        <button onClick={() => setGalleryOpen(true)}>
-          <ImageIcon size={16} />
-          {c.imagens.length} {c.imagens.length === 1 ? 'imagem' : 'imagens'}
-        </button>
+        {c.imagens.length ? (
+          <button onClick={() => setGalleryOpen(true)}>
+            <ImageIcon size={16} />
+            {c.imagens.length} {c.imagens.length === 1 ? 'imagem' : 'imagens'}
+          </button>
+        ) : (
+          <span className="photo-caption">
+            <ImageIcon size={16} />
+            Imagem ilustrativa
+          </span>
+        )}
       </div>
       <div className="section-content">
         <div className="section-heading">

@@ -1,10 +1,7 @@
 import { CityCaseList } from '@/features/cityhall/components/CityCaseList';
-import { DashboardCharts } from '@/features/cityhall/components/DashboardCharts';
 import { DashboardFilters } from '@/features/cityhall/components/DashboardFilters';
-import { DashboardMetrics } from '@/features/cityhall/components/DashboardMetrics';
 import { useCityHallDashboard } from '@/features/cityhall/hooks/useCityHallDashboard';
 import { PageTitle } from '@/shared/ui/PageTitle';
-import { State } from '@/shared/ui/State';
 
 export function CityHallPage() {
   const {
@@ -14,11 +11,8 @@ export function CityHallPage() {
     mapVisible,
     setMapVisible,
     list,
-    metrics,
     update,
     bairros,
-    m,
-    max,
   } = useCityHallDashboard();
   return (
     <div className="page-container institution-page">
@@ -33,9 +27,6 @@ export function CityHallPage() {
         update={update}
         setFilters={setFilters}
       />
-      {metrics.error && <State error={metrics.error} retry={metrics.retry} />}
-      <DashboardMetrics m={m} metrics={metrics} />
-      <DashboardCharts max={max} m={m} />
       <CityCaseList
         mapVisible={mapVisible}
         setMapVisible={setMapVisible}

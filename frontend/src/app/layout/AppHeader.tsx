@@ -10,7 +10,6 @@ import { isDemo } from '@/config/environment';
 
 import { DemoBadge } from '@/app/layout/DemoBadge';
 
-import { HeaderNotifications } from '@/app/layout/HeaderNotifications';
 
 import { UserMenuLink } from '@/app/layout/UserMenuLink';
 
@@ -27,7 +26,6 @@ export function AppHeader() {
             Santos, SP
           </span>
           {isDemo && <DemoBadge />}
-          {user?.perfil === 'CIDADAO' && <HeaderNotifications />}
           <UserMenuLink user={user} />
         </div>
       </div>

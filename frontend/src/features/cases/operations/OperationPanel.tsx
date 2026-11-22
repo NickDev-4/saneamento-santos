@@ -1,5 +1,4 @@
 import type { Case } from '@/contracts';
-import { AuthorContact } from '@/features/cases/operations/AuthorContact';
 import { CommentComposer } from '@/features/cases/operations/CommentComposer';
 import { OperationActions } from '@/features/cases/operations/OperationActions';
 import { OperationDialog } from '@/features/cases/operations/OperationDialog';
@@ -11,8 +10,6 @@ export function OperationPanel({ item: c }: { item: Case }) {
     action,
     setAction,
     busy,
-    internal,
-    setInternal,
     comment,
     setComment,
     formError,
@@ -34,7 +31,6 @@ export function OperationPanel({ item: c }: { item: Case }) {
             Atendimento
           </h2>
         </div>
-        {c.autor && <AuthorContact c={c} />}
         <OperationActions
           can={can}
           busy={busy}
@@ -45,8 +41,6 @@ export function OperationPanel({ item: c }: { item: Case }) {
         />
       </section>
       <CommentComposer
-        internal={internal}
-        setInternal={setInternal}
         comment={comment}
         setComment={setComment}
         busy={busy}

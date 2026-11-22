@@ -1,4 +1,4 @@
-import type { Api, Case } from '@/contracts';
+import type { Api, Case, Update } from '@/contracts';
 import type { HttpClient } from '@/services/http/client';
 import { form } from '@/services/http/multipart';
 
@@ -48,7 +48,7 @@ export function createCasesService({
         `${scope === 'public' ? '/public' : ''}/chamados/${encodeURIComponent(id)}`,
       );
       if (scope === 'staff')
-        c.observacoesInternas = await request(
+        c.observacoesInternas = await pages<Update>(
           `/chamados/${encodeURIComponent(id)}/observacoes-internas`,
         );
       return c;
@@ -61,10 +61,11 @@ export function createCasesService({
     cancel: (id) => request(`/chamados/${encodeURIComponent(id)}/cancelamento`, { method: 'POST' }),
     transition: (id, status, texto, foto) => {
       const body = new FormData();
-      body.append(
-        'dados',
-        new Blob([json({ status, comentarioPublico: texto })], { type: 'application/json' }),
-      );
+      const dados =
+        status === 'ENCERRADO_SEM_ATENDIMENTO'
+          ? { status, justificativa: texto }
+          : { status, comentarioPublico: texto };
+      body.append('dados', new Blob([json(dados)], { type: 'application/json' }));
       if (foto) body.append('imagemResolucao', foto);
       return request(`/chamados/${encodeURIComponent(id)}/status`, { method: 'PATCH', body });
     },
@@ -86,7 +87,10 @@ export function createCasesService({
     comment: (id, texto, internal) =>
       request(
         `/chamados/${encodeURIComponent(id)}/${internal ? 'observacoes-internas' : 'atualizacoes-publicas'}`,
-        { method: 'POST', body: json({ texto }) },
+        {
+          method: 'POST',
+          body: json(internal ? { texto } : { titulo: 'Atualização da equipe', texto }),
+        },
       ),
   };
   return service;

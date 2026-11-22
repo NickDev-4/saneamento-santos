@@ -49,6 +49,7 @@ export interface Case {
     protocolo: string;
     status: Status;
     previsaoVisita: Case['previsaoVisita'];
+    detalhePublicoUrl?: string | null;
   };
   reincidenciaDe?: string | null;
   motivoEncerramento?: string;

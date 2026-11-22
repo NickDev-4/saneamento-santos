@@ -3,9 +3,9 @@ import type { CaseOperationsController } from '@/features/cases/operations/useCa
 import { Button } from '@/shared/ui/Button';
 import { Eye } from 'lucide-react';
 
-type Props = Pick<CaseOperationsController, 'busy' | 'open' | 'approvePublication'> & { c: Case };
+type Props = Pick<CaseOperationsController, 'busy' | 'approvePublication'> & { c: Case };
 
-export function PublicationControls({ c, busy, open, approvePublication }: Props) {
+export function PublicationControls({ c, busy, approvePublication }: Props) {
   return (
     <div className="publication-panel">
       <span className="small muted">Publicação no mapa</span>
@@ -16,19 +16,12 @@ export function PublicationControls({ c, busy, open, approvePublication }: Props
             ? 'Aguardando validação'
             : 'Publicação não aprovada'}
       </strong>
-      <div>
-        {c.publicacao !== 'APROVADO' && (
-          <Button variant="secondary" disabled={busy} onClick={approvePublication}>
-            <Eye size={16} />
-            Aprovar publicação
-          </Button>
-        )}
-        {c.publicacao !== 'REJEITADO' && (
-          <button className="text-link" disabled={busy} onClick={() => open('rejeitar')}>
-            Não aprovar
-          </button>
-        )}
-      </div>
+      {c.publicacao !== 'APROVADO' && (
+        <Button variant="secondary" disabled={busy} onClick={approvePublication}>
+          <Eye size={16} />
+          Aprovar publicação
+        </Button>
+      )}
     </div>
   );
 }

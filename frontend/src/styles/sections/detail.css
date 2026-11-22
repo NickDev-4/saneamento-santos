@@ -39,7 +39,8 @@
   width: 100%;
   object-fit: cover;
 }
-.detail-photo > button {
+.detail-photo > button,
+.detail-photo > .photo-caption {
   position: absolute;
   right: 15px;
   bottom: 15px;

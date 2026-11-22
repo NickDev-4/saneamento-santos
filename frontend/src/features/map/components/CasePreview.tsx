@@ -8,6 +8,7 @@ import { ArrowRight, MapPin, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export function CasePreview({ item, onClose }: { item: Case; onClose: () => void }) {
+  const firstImage = item.imagens[0];
   return (
     <div className="case-preview">
       <div className="preview-heading" data-sheet-drag-area>
@@ -19,11 +20,11 @@ export function CasePreview({ item, onClose }: { item: Case; onClose: () => void
       <div className="preview-image">
         <img
           src={resolveApiImageUrl(
-            item.imagens[0]?.url || '/cenario-esgoto.svg',
+            firstImage?.url || '/cenario-esgoto.svg',
             environment.apiBaseUrl,
           )}
           alt={
-            item.imagens[0]?.ilustrativa
+            !firstImage || firstImage.ilustrativa
               ? 'Ilustração do cenário fictício de esgoto'
               : 'Foto do problema relatado'
           }

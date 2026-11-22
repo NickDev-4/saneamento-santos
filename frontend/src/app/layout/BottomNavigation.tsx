@@ -1,5 +1,5 @@
 import { useAppNavigation } from '@/app/layout/useAppNavigation';
-import { Bell, Map, Plus, UserRound } from 'lucide-react';
+import { Map, Plus, UserRound } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
 export function BottomNavigation() {
@@ -23,12 +23,6 @@ export function BottomNavigation() {
             <Plus size={27} />
           </span>
           <span>Registrar</span>
-        </NavLink>
-      )}
-      {!institutional && (
-        <NavLink to="/avisos">
-          <Bell size={22} />
-          <span>Avisos</span>
         </NavLink>
       )}
       <NavLink to={user ? '/perfil' : '/entrar'}>
