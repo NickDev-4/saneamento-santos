@@ -20,6 +20,20 @@ npm.cmd run dev
 
 Acesse <http://127.0.0.1:5173>. Na tela de acesso, os botões da demonstração permitem entrar como cidadão, Sabesp ou Prefeitura.
 
+### Acessos de demonstração
+
+No modo padrão (`VITE_DATA_MODE=demo`), não é necessário informar e-mail ou senha. Abra **Entrar na conta** e escolha um dos botões:
+
+| Perfil | Acesso na demonstração |
+| --- | --- |
+| Cliente (cidadão) | **Cidadão** |
+| Sabesp | **Sabesp** |
+| Prefeitura | **Prefeitura** |
+
+Esses acessos usam dados fictícios em memória e servem apenas para explorar o protótipo. Eles não são credenciais de contas reais.
+
+Para acessar a API Java, use contas previamente cadastradas no MongoDB. Em uma primeira configuração, defina e-mail, nome e senha nos grupos `SEED_CIDADAO_*`, `SEED_SABESP_*` e `SEED_PREFEITURA_*` do arquivo local `backend/.env` (os nomes exatos estão em `backend/.env.example`) e inicie o backend. As senhas devem ter de 12 a 72 bytes UTF-8. Depois, entre com o e-mail e a senha definidos para o perfil correspondente. O seed só cria contas ausentes; ele não redefine senhas nem altera contas existentes. Mantenha credenciais fora do README e do Git.
+
 ## Verificações
 
 Dentro de `frontend/`:
