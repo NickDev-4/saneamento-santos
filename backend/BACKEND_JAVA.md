@@ -90,6 +90,72 @@ PasswordEncoder passwordEncoder() {
 
 O codificador armazena senhas como hashes BCrypt, em vez de texto legível. Na mesma configuração, a aplicação usa sessão por cookie, proteção CSRF e exige autenticação nos endpoints que não foram liberados explicitamente.
 
+## Java e termos que aparecem no código
+
+### Como ler a declaração de um método
+
+Veja esta assinatura simplificada:
+
+```java
+public CitizenCaseResponse detail(String id, UserPrincipal principal)
+```
+
+- `public` diz que outras classes podem chamar esse método.
+- `CitizenCaseResponse` é o tipo de dado que ele devolve.
+- `detail` é o nome do método (uma ação/função).
+- `String id` e `UserPrincipal principal` são parâmetros: informações que o método recebe. `String` é texto; `UserPrincipal` representa o usuário autenticado.
+
+Quando o método não devolve um valor, o tipo de retorno é `void`. `return` encerra o método e entrega o resultado a quem o chamou.
+
+### Anotações do Spring
+
+Anotações são marcações iniciadas por `@`. Elas dão instruções ao Spring sem precisar escrever toda a configuração manualmente:
+
+- `@RestController`: a classe recebe requisições web e transforma os resultados em respostas, geralmente JSON.
+- `@RequestMapping` e `@GetMapping` / `@PostMapping`: associam caminhos e tipos de requisição HTTP a métodos Java.
+- `@Service`: identifica uma classe que executa regras e operações da aplicação.
+- `@Bean`: pede ao Spring que crie e disponibilize um objeto para outras partes usarem.
+- `@Valid`: solicita a validação dos dados recebidos conforme as regras declaradas.
+- `@PreAuthorize`: verifica a permissão do usuário antes de executar o método.
+
+Por exemplo, `@GetMapping("/me/chamados")` faz com que uma requisição GET nesse caminho seja encaminhada ao método marcado.
+
+### Tipos e coleções
+
+- `String` guarda texto; `int` guarda números inteiros; `boolean` guarda `true` ou `false`.
+- `List<T>` representa uma lista de itens do tipo `T`, por exemplo `List<MultipartFile>` para vários arquivos.
+- `Optional<T>` representa um resultado que pode existir ou estar ausente. Isso ajuda a tratar uma busca sem resultado de forma explícita.
+- `ResponseEntity<T>` permite devolver o conteúdo `T` junto com detalhes HTTP, como o código `201`.
+- `var` (quando usado) deixa o compilador deduzir o tipo a partir do valor atribuído; o tipo continua definido durante a compilação.
+
+Os sinais `<` e `>` indicam o tipo que uma coleção ou objeto genérico contém. Em `List<String>`, por exemplo, a lista guarda textos.
+
+### Objetos, construtores e `this`
+
+Uma classe descreve um tipo de objeto. Um **construtor** cria esse objeto e recebe os valores iniciais. No código, por exemplo, `new GeometryFactory()` cria um objeto novo.
+
+`this` significa “este objeto”. É usado para acessar um campo ou método da própria instância. O ponto em `cases.create(...)` também é uma chamada: acessa o método `create` pelo objeto guardado em `cases`.
+
+### Condições, exceções e expressões
+
+- `if (...) { ... }` executa um bloco apenas quando a condição é verdadeira.
+- `!` significa “não”; `||` significa “ou”; `&&` significa “e”. Assim, `!existe` quer dizer “não existe”.
+- `throw new ...` interrompe o fluxo normal e sinaliza um erro. O tratamento de exceções converte esse erro numa resposta adequada para a API.
+- `->` aparece em expressões lambda, uma forma curta de descrever uma ação. Em `polygon -> polygon.covers(point)`, cada polígono da lista é testado para saber se cobre o ponto.
+- `stream()` permite processar itens de uma coleção em sequência. `noneMatch(...)` responde verdadeiro quando nenhum item atende à condição indicada.
+
+### Interfaces, `record` e nomes automáticos
+
+Uma **interface** define operações que uma classe ou serviço oferece. `CaseRepository extends MongoRepository<...>` herda operações prontas do Spring Data para acessar o banco.
+
+`record` é uma forma concisa de declarar uma classe usada principalmente para transportar dados. O compilador gera partes repetitivas, como acesso aos valores e construtor. Por isso `CaseDocument` aparece como `record`.
+
+O projeto também usa Lombok. Anotações como `@RequiredArgsConstructor` (quando presentes) pedem ao compilador que gere código repetitivo, como construtores para campos obrigatórios. Esse código gerado não aparece diretamente no arquivo Java.
+
+### HTTP e API
+
+Um **endpoint** é o endereço e a ação que a API oferece. `GET` costuma consultar dados; `POST` costuma criar; `PATCH` costuma alterar parcialmente. Códigos como `200`, `201`, `400` e `401` informam, respectivamente, sucesso, criação, dados inválidos e falta de autenticação.
+
 ## Organização do código
 
 - **`BackendApplication.java`** inicia o Spring Boot e configura a aplicação.
