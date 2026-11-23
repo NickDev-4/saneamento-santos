@@ -17,6 +17,9 @@ public final class CasePublicVisibility {
 	}
 
 	public static boolean isPublic(CaseDocument item) {
-		return item.publicacao() == PublicationState.APROVADO && !HIDDEN_STATUSES.contains(item.status());
+		return item.publicacao() == PublicationState.APROVADO
+				&& !HIDDEN_STATUSES.contains(item.status())
+				&& item.endereco() != null
+				&& "Santos".equalsIgnoreCase(item.endereco().cidade());
 	}
 }

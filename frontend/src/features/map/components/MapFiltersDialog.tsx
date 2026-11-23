@@ -5,6 +5,10 @@ import { Field } from '@/shared/ui/Field';
 import { statusLabels } from '@/contracts';
 
 import { publicStatuses } from '@/features/cases/constants/publicStatuses';
+import {
+  allStatusesFilterValue,
+  finalizedFilterValue,
+} from '@/features/cases/constants/publicStatuses';
 
 import { Button } from '@/shared/ui/Button';
 
@@ -36,7 +40,9 @@ export function MapFiltersDialog({
         </Field>
         <Field label="Status do atendimento" htmlFor="f-status">
           <select id="f-status" value={status} onChange={(e) => update('status', e.target.value)}>
-            <option value="">Todos os status</option>
+            <option value="">Em andamento</option>
+            <option value={finalizedFilterValue}>Finalizados</option>
+            <option value={allStatusesFilterValue}>Todos os chamados</option>
             {publicStatuses.map((s) => (
               <option value={s} key={s}>
                 {statusLabels[s]}
