@@ -17,20 +17,21 @@ class LocalFileImageContentStorageTests {
 	@Test
 	void storesReadsAndDeletesOpaqueImageContent() {
 		LocalFileImageContentStorage storage = new LocalFileImageContentStorage(temporaryDirectory.toString());
+		String caseId = UUID.randomUUID().toString();
 		String id = UUID.randomUUID().toString();
 		byte[] content = new byte[] { 1, 2, 3 };
 
-		storage.store(id, content);
+		storage.store(caseId, id, content);
 
-		assertArrayEquals(content, storage.read(id));
-		storage.delete(id);
-		assertThrows(ImageStorageException.class, () -> storage.read(id));
+		assertArrayEquals(content, storage.read(caseId, id));
+		storage.delete(caseId, id);
+		assertThrows(ImageStorageException.class, () -> storage.read(caseId, id));
 	}
 
 	@Test
 	void refusesClientControlledStoragePaths() {
 		LocalFileImageContentStorage storage = new LocalFileImageContentStorage(temporaryDirectory.toString());
 
-		assertThrows(ImageStorageException.class, () -> storage.read("..\\private"));
+		assertThrows(ImageStorageException.class, () -> storage.read("..\\private", "image-id"));
 	}
 }

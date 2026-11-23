@@ -65,7 +65,8 @@ export function useReportForm() {
   const [observadoEm, setObservadoEm] = useState(localDate());
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const { files, setFiles, kept, setKept, previews, addFiles } = useReportPhotos(setErrors);
+  const { files, setFiles, kept, setKept, previews, addFiles, processing: photosProcessing } =
+    useReportPhotos(setErrors);
   const [busy, setBusy] = useState(false);
   const [looking, setLooking] = useState(false);
   const [lookupMessage, setLookupMessage] = useState('');
@@ -188,6 +189,7 @@ export function useReportForm() {
     kept,
     setKept,
     previews,
+    photosProcessing,
     errors,
     busy,
     looking,

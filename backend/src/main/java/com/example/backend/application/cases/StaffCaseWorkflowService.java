@@ -142,7 +142,7 @@ public class StaffCaseWorkflowService {
 				appendUpdate(current, title, text, approved, now, principal.id()),
 				current.vinculoId(),
 				now);
-		CaseDocument saved = saveWorkflowChange(updated, List.of());
+		CaseDocument saved = saveWorkflowChange(id, updated, List.of());
 		notifications.notifyCaseOwners(
 				saved,
 				approved ? NotificationType.PUBLICACAO_APROVADA : NotificationType.PUBLICACAO_REJEITADA,
@@ -163,8 +163,8 @@ public class StaffCaseWorkflowService {
 		Instant now = Instant.now();
 		List<CaseDocument.ImageSnapshot> uploaded = resolutionImage == null
 				? List.of()
-				: images.storeNewImages(List.of(resolutionImage), 0);
-		boolean rollbackCleanupRegistered = registerRollbackCleanup(uploaded);
+				: images.storeNewImages(id, List.of(resolutionImage), 0);
+		boolean rollbackCleanupRegistered = registerRollbackCleanup(id, uploaded);
 		try {
 			List<CaseDocument.ImageSnapshot> mergedImages = new ArrayList<>(safeImages(current));
 			for (CaseDocument.ImageSnapshot image : uploaded) {
@@ -197,12 +197,12 @@ public class StaffCaseWorkflowService {
 			return staffResponse(saved);
 		} catch (OptimisticLockingFailureException exception) {
 			if (!rollbackCleanupRegistered) {
-				images.discardNewImages(uploaded, exception);
+				images.discardNewImages(id, uploaded, exception);
 			}
 			throw conflict("O chamado foi alterado por outra operação. Atualize os dados e tente novamente.");
 		} catch (DataAccessException exception) {
 			if (!rollbackCleanupRegistered) {
-				images.discardNewImages(uploaded, exception);
+				images.discardNewImages(id, uploaded, exception);
 			}
 			throw exception;
 		}
@@ -244,7 +244,7 @@ public class StaffCaseWorkflowService {
 						principal.id()),
 				current.vinculoId(),
 				now);
-		CaseDocument saved = saveWorkflowChange(updated, List.of());
+		CaseDocument saved = saveWorkflowChange(id, updated, List.of());
 		notifications.notifyCaseOwners(
 				saved,
 				NotificationType.PREVISAO_ATUALIZADA,
@@ -278,7 +278,7 @@ public class StaffCaseWorkflowService {
 						principal.id()),
 				current.vinculoId(),
 				now);
-		CaseDocument saved = saveWorkflowChange(updated, List.of());
+		CaseDocument saved = saveWorkflowChange(id, updated, List.of());
 		notifications.notifyCaseOwners(
 				saved,
 				NotificationType.ATUALIZACAO_PUBLICA,
@@ -341,13 +341,13 @@ public class StaffCaseWorkflowService {
 						principal.id()),
 				main.vinculoId(),
 				now);
-		CaseDocument savedMain = saveWorkflowChange(updatedMain, List.of());
+		CaseDocument savedMain = saveWorkflowChange(main.id(), updatedMain, List.of());
 		notifications.notifyCaseOwners(
 				savedMain,
 				NotificationType.VINCULO,
 				"Novo relato relacionado",
 				"Um relato duplicado foi relacionado ao atendimento acompanhado.");
-		CaseDocument saved = saveWorkflowChange(linked, List.of());
+		CaseDocument saved = saveWorkflowChange(id, linked, List.of());
 		notifications.notifyUser(
 				saved.autorId(),
 				saved,
@@ -389,15 +389,16 @@ public class StaffCaseWorkflowService {
 	}
 
 	private CaseDocument saveWorkflowChange(
+			String caseId,
 			CaseDocument updated,
 			List<CaseDocument.ImageSnapshot> uploadedImages) {
 		try {
 			return caseRepository.save(updated);
 		} catch (OptimisticLockingFailureException exception) {
-			images.discardNewImages(uploadedImages, exception);
+			images.discardNewImages(caseId, uploadedImages, exception);
 			throw conflict("O chamado foi alterado por outra operação. Atualize os dados e tente novamente.");
 		} catch (DataAccessException exception) {
-			images.discardNewImages(uploadedImages, exception);
+			images.discardNewImages(caseId, uploadedImages, exception);
 			throw exception;
 		}
 	}
@@ -487,7 +488,7 @@ public class StaffCaseWorkflowService {
 				.toList();
 	}
 
-	private boolean registerRollbackCleanup(List<CaseDocument.ImageSnapshot> uploaded) {
+	private boolean registerRollbackCleanup(String caseId, List<CaseDocument.ImageSnapshot> uploaded) {
 		if (uploaded.isEmpty() || !TransactionSynchronizationManager.isSynchronizationActive()) {
 			return false;
 		}
@@ -496,6 +497,7 @@ public class StaffCaseWorkflowService {
 			public void afterCompletion(int status) {
 				if (status != TransactionSynchronization.STATUS_COMMITTED) {
 					images.discardNewImages(
+							caseId,
 							uploaded,
 							new IllegalStateException("Workflow transaction rolled back after image upload."));
 				}

@@ -31,6 +31,7 @@ export function ReportPage() {
     kept,
     setKept,
     previews,
+    photosProcessing,
     errors,
     busy,
     looking,
@@ -114,6 +115,7 @@ export function ReportPage() {
               kept={kept}
               setFiles={setFiles}
               previews={previews}
+              photosProcessing={photosProcessing}
             />
           )}
           {step === 2 && (
@@ -133,7 +135,7 @@ export function ReportPage() {
               {errors.envio}
             </p>
           )}
-          <ReportNavigation setStep={setStep} step={step} id={id} busy={busy} />
+          <ReportNavigation setStep={setStep} step={step} id={id} busy={busy || photosProcessing} />
         </form>
       </div>
       <p className="report-footer">
