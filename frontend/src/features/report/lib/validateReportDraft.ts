@@ -14,7 +14,8 @@ export function validateReportDraft(
 ): Record<string, string> {
   const e: Record<string, string> = {};
   if (step === 0) {
-    if (endereco.cep.length !== 8) e.cep = 'Informe um CEP com 8 números.';
+    if (endereco.cep.replace(/\D/g, '').length !== 8)
+      e.cep = 'Informe um CEP com 8 números.';
     if (!endereco.logradouro.trim()) e.logradouro = 'Informe a rua ou avenida.';
     if (!endereco.numero.trim() && !endereco.semNumero)
       e.numero = 'Informe o número ou marque sem número.';

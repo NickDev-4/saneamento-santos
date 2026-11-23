@@ -74,7 +74,7 @@ export function useReportForm() {
   useEffect(() => {
     const c = existing.data;
     if (c) {
-      setEndereco(c.endereco);
+      setEndereco({ ...c.endereco, cep: c.endereco.cep.replace(/\D/g, '') });
       setLocation(c.localizacao);
       setTipoId(c.tipoId);
       setDescricao(c.descricao);
@@ -87,7 +87,8 @@ export function useReportForm() {
     heading.current?.focus({ preventScroll: true });
   }, [step]);
   function setAddress<K extends keyof Address>(key: K, value: Address[K]) {
-    setEndereco((a) => ({ ...a, [key]: value }));
+    const nextValue = key === 'cep' && typeof value === 'string' ? value.replace(/\D/g, '') : value;
+    setEndereco((a) => ({ ...a, [key]: nextValue }));
   }
   async function lookup() {
     const cep = endereco.cep.replace(/\D/g, '');
