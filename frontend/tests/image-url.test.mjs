@@ -13,6 +13,17 @@ test('resolves API image paths against a separate API origin', () => {
   );
 });
 
+test('resolves public API image paths against a separate API origin', () => {
+  assert.equal(
+    resolveApiImageUrl(
+      '/api/v1/public/imagens/example',
+      'https://api.example.test/api/v1',
+      'https://app.example.test',
+    ),
+    'https://api.example.test/api/v1/public/imagens/example',
+  );
+});
+
 test('keeps root-relative frontend assets on the application origin', () => {
   assert.equal(
     resolveApiImageUrl(

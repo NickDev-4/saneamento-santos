@@ -1,0 +1,17 @@
+Logins padrão de demonstração — Saneamento Santos
+
+As três contas usam a mesma senha:
+Senha: SantosDemo2026!
+
+Cidadão
+E-mail: demo-cidadao@saneamento.test
+
+Sabesp
+E-mail: demo-sabesp@saneamento.test
+
+Prefeitura
+E-mail: demo-prefeitura@saneamento.test
+
+
+Registro de chamado
+11045-501

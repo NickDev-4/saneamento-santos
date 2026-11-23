@@ -14,6 +14,10 @@ export function CaseGalleryDialog({ c, setGalleryOpen }: Props) {
           <figure key={image.id}>
             <img
               src={resolveApiImageUrl(image.url, environment.apiBaseUrl)}
+              onError={(event) => {
+                event.currentTarget.onerror = null;
+                event.currentTarget.src = '/cenario-esgoto.svg';
+              }}
               alt={
                 image.ilustrativa
                   ? 'Ilustração do cenário de teste'

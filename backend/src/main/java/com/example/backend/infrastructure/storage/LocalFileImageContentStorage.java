@@ -71,12 +71,19 @@ public class LocalFileImageContentStorage implements ImageContentStorage {
 
 	private Path resolve(String caseId, String imageId) {
 		try {
-			validateUuid(caseId);
+			validateCaseId(caseId);
 			validateUuid(imageId);
 			return root.resolve("chamados").resolve(caseId).resolve(imageId);
 		} catch (IllegalArgumentException exception) {
 			throw new ImageStorageException(exception);
 		}
+	}
+
+	private void validateCaseId(String value) {
+		if (value != null && value.matches("[0-9a-fA-F]{24}")) {
+			return;
+		}
+		validateUuid(value);
 	}
 
 	private Path resolveLegacy(String imageId) {

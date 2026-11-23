@@ -18,6 +18,10 @@ export function CaseOverview({ c, setGalleryOpen }: Props) {
             firstImage?.url || '/cenario-esgoto.svg',
             environment.apiBaseUrl,
           )}
+          onError={(event) => {
+            event.currentTarget.onerror = null;
+            event.currentTarget.src = '/cenario-esgoto.svg';
+          }}
           alt={
             !firstImage || firstImage.ilustrativa
               ? 'Ilustração de um cenário fictício de extravasamento de esgoto'

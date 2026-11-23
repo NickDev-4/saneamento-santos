@@ -23,6 +23,10 @@ export function CasePreview({ item, onClose }: { item: Case; onClose: () => void
             firstImage?.url || '/cenario-esgoto.svg',
             environment.apiBaseUrl,
           )}
+          onError={(event) => {
+            event.currentTarget.onerror = null;
+            event.currentTarget.src = '/cenario-esgoto.svg';
+          }}
           alt={
             !firstImage || firstImage.ilustrativa
               ? 'Ilustração do cenário fictício de esgoto'
