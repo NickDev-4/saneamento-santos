@@ -36,6 +36,7 @@ public class CaseImageService {
 	}
 
 	public List<CaseDocument.ImageSnapshot> storeNewImages(
+			String caseId,
 			List<MultipartFile> files,
 			int retainedCount) {
 		List<ValidatedImage> validated = validator.validate(files, retainedCount);
@@ -43,7 +44,7 @@ public class CaseImageService {
 		try {
 			for (ValidatedImage image : validated) {
 				String id = UUID.randomUUID().toString();
-				storage.store(id, image.content());
+				storage.store(caseId, id, image.content());
 				stored.add(new CaseDocument.ImageSnapshot(
 						id,
 						"/api/v1/imagens/" + id,
@@ -53,19 +54,19 @@ public class CaseImageService {
 			}
 			return List.copyOf(stored);
 		} catch (ImageStorageException exception) {
-			deleteNewImages(stored, exception);
+			deleteNewImages(caseId, stored, exception);
 			throw exception;
 		}
 	}
 
-	public void discardNewImages(List<CaseDocument.ImageSnapshot> images, Throwable originalFailure) {
-		deleteNewImages(images, originalFailure);
+	public void discardNewImages(String caseId, List<CaseDocument.ImageSnapshot> images, Throwable originalFailure) {
+		deleteNewImages(caseId, images, originalFailure);
 	}
 
-	public void deleteRemovedImages(List<CaseDocument.ImageSnapshot> images) {
+	public void deleteRemovedImages(String caseId, List<CaseDocument.ImageSnapshot> images) {
 		for (CaseDocument.ImageSnapshot image : images) {
 			try {
-				storage.delete(image.id());
+				storage.delete(caseId, image.id());
 			} catch (ImageStorageException exception) {
 				LOGGER.error("Could not remove image content after a successful case update.", exception);
 			}
@@ -92,18 +93,18 @@ public class CaseImageService {
 		if (!image.aprovada()) {
 			throw notFound();
 		}
-		return readImage(image);
+		return readImage(caseDocument, image.id());
 	}
 
 	private ImageContent readImage(CaseDocument caseDocument, String id) {
-		return readImage(findImage(caseDocument, id));
+		return readImage(findImage(caseDocument, id), caseDocument.id());
 	}
 
-	private ImageContent readImage(CaseDocument.ImageSnapshot image) {
+	private ImageContent readImage(CaseDocument.ImageSnapshot image, String caseId) {
 		if (image.contentType() == null || !ALLOWED_CONTENT_TYPES.contains(image.contentType())) {
 			throw new ImageStorageException();
 		}
-		return new ImageContent(image.contentType(), storage.read(image.id()));
+		return new ImageContent(image.contentType(), storage.read(caseId, image.id()));
 	}
 
 	private CaseDocument findCaseForImage(String id) {
@@ -121,10 +122,13 @@ public class CaseImageService {
 				.orElseThrow(CaseImageService::notFound);
 	}
 
-	private void deleteNewImages(List<CaseDocument.ImageSnapshot> images, Throwable originalFailure) {
+	private void deleteNewImages(
+			String caseId,
+			List<CaseDocument.ImageSnapshot> images,
+			Throwable originalFailure) {
 		for (CaseDocument.ImageSnapshot image : images) {
 			try {
-				storage.delete(image.id());
+				storage.delete(caseId, image.id());
 			} catch (ImageStorageException cleanupFailure) {
 				originalFailure.addSuppressed(cleanupFailure);
 				LOGGER.error("Could not remove an image after a failed upload.", cleanupFailure);

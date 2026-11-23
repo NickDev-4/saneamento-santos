@@ -18,6 +18,7 @@ type Props = Pick<
   | 'kept'
   | 'setFiles'
   | 'previews'
+  | 'photosProcessing'
 >;
 
 export function ReportProblemStep({
@@ -34,6 +35,7 @@ export function ReportProblemStep({
   kept,
   setFiles,
   previews,
+  photosProcessing,
 }: Props) {
   return (
     <div className="form-stack">
@@ -97,6 +99,7 @@ export function ReportProblemStep({
         kept={kept}
         setFiles={setFiles}
         previews={previews}
+        photosProcessing={photosProcessing}
       />
     </div>
   );

@@ -5,10 +5,18 @@ import { Camera, ImagePlus, X } from 'lucide-react';
 
 type Props = Pick<
   ReportFormController,
-  'addFiles' | 'errors' | 'setKept' | 'kept' | 'setFiles' | 'previews'
+  'addFiles' | 'errors' | 'setKept' | 'kept' | 'setFiles' | 'previews' | 'photosProcessing'
 >;
 
-export function ReportPhotos({ addFiles, errors, setKept, kept, setFiles, previews }: Props) {
+export function ReportPhotos({
+  addFiles,
+  errors,
+  setKept,
+  kept,
+  setFiles,
+  previews,
+  photosProcessing,
+}: Props) {
   return (
     <div className="field">
       <label htmlFor="fotos">
@@ -17,7 +25,8 @@ export function ReportPhotos({ addFiles, errors, setKept, kept, setFiles, previe
       <div className="upload-zone">
         <ImagePlus size={28} />
         <strong>Mostre o que está acontecendo</strong>
-        <p>JPG, PNG ou WebP · até 5 MB por foto</p>
+        <p>JPG, PNG ou WebP · até 20 MB antes da redução (máximo 1 MB após)</p>
+        {photosProcessing && <p role="status">Preparando as fotos para envio…</p>}
         <div className="upload-actions">
           <label className="button button-secondary" htmlFor="fotos">
             <ImagePlus size={17} />
@@ -29,6 +38,7 @@ export function ReportPhotos({ addFiles, errors, setKept, kept, setFiles, previe
             className="file-input"
             accept="image/jpeg,image/png,image/webp"
             multiple
+            disabled={photosProcessing}
             onChange={(e) => {
               addFiles(e.target.files);
               e.target.value = '';
@@ -44,6 +54,7 @@ export function ReportPhotos({ addFiles, errors, setKept, kept, setFiles, previe
             className="file-input"
             accept="image/jpeg,image/png,image/webp"
             capture="environment"
+            disabled={photosProcessing}
             onChange={(e) => {
               addFiles(e.target.files);
               e.target.value = '';

@@ -149,10 +149,11 @@ public class CitizenCaseService {
 			UserPrincipal principal) {
 		CaseData data = validateRequest(request, principal.id());
 		UserResponse author = currentUserResponse(principal);
-		List<CaseDocument.ImageSnapshot> uploaded = images.storeNewImages(files, 0);
+		String caseId = UUID.randomUUID().toString();
+		List<CaseDocument.ImageSnapshot> uploaded = images.storeNewImages(caseId, files, 0);
 		Instant now = Instant.now();
 		CaseDocument document = new CaseDocument(
-				null,
+				caseId,
 				newProtocol(),
 				data.type().id(),
 				data.type().nome(),
@@ -181,13 +182,13 @@ public class CitizenCaseService {
 		try {
 			return CitizenCaseResponse.from(caseRepository.save(document), true, author);
 		} catch (DuplicateKeyException exception) {
-			images.discardNewImages(uploaded, exception);
+			images.discardNewImages(caseId, uploaded, exception);
 			throw new ApiException(
 					HttpStatus.CONFLICT,
 					"CASE_PROTOCOL_CONFLICT",
 					"Não foi possível gerar um protocolo. Tente novamente.");
 		} catch (DataAccessException exception) {
-			images.discardNewImages(uploaded, exception);
+			images.discardNewImages(caseId, uploaded, exception);
 			throw exception;
 		}
 	}
@@ -209,7 +210,7 @@ public class CitizenCaseService {
 		List<CaseDocument.ImageSnapshot> removed = currentImages.stream()
 				.filter(image -> !retainedImageIds.contains(image.id()))
 				.toList();
-		List<CaseDocument.ImageSnapshot> uploaded = images.storeNewImages(files, retained.size());
+		List<CaseDocument.ImageSnapshot> uploaded = images.storeNewImages(id, files, retained.size());
 		List<CaseDocument.ImageSnapshot> combinedImages = new ArrayList<>(retained);
 		combinedImages.addAll(uploaded);
 		Instant now = Instant.now();
@@ -244,13 +245,13 @@ public class CitizenCaseService {
 		try {
 			saved = caseRepository.save(updated);
 		} catch (OptimisticLockingFailureException exception) {
-			images.discardNewImages(uploaded, exception);
+			images.discardNewImages(id, uploaded, exception);
 			throw conflict("O chamado foi alterado por outra operação. Atualize os dados e tente novamente.");
 		} catch (DataAccessException exception) {
-			images.discardNewImages(uploaded, exception);
+			images.discardNewImages(id, uploaded, exception);
 			throw exception;
 		}
-		images.deleteRemovedImages(removed);
+		images.deleteRemovedImages(id, removed);
 		return CitizenCaseResponse.from(saved, true, author);
 	}
 

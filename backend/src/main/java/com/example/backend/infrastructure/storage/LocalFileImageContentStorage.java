@@ -22,12 +22,12 @@ public class LocalFileImageContentStorage implements ImageContentStorage {
 	}
 
 	@Override
-	public void store(String id, byte[] content) {
-		Path destination = resolve(id);
+	public void store(String caseId, String imageId, byte[] content) {
+		Path destination = resolve(caseId, imageId);
 		Path temporary = null;
 		try {
-			Files.createDirectories(root);
-			temporary = Files.createTempFile(root, ".image-", ".tmp");
+			Files.createDirectories(destination.getParent());
+			temporary = Files.createTempFile(destination.getParent(), ".image-", ".tmp");
 			Files.write(temporary, content, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
 			try {
 				Files.move(temporary, destination, StandardCopyOption.ATOMIC_MOVE);
@@ -47,32 +47,51 @@ public class LocalFileImageContentStorage implements ImageContentStorage {
 	}
 
 	@Override
-	public byte[] read(String id) {
+	public byte[] read(String caseId, String imageId) {
 		try {
-			return Files.readAllBytes(resolve(id));
+			Path currentPath = resolve(caseId, imageId);
+			if (Files.isRegularFile(currentPath)) {
+				return Files.readAllBytes(currentPath);
+			}
+			return Files.readAllBytes(resolveLegacy(imageId));
 		} catch (IOException exception) {
 			throw new ImageStorageException(exception);
 		}
 	}
 
 	@Override
-	public void delete(String id) {
+	public void delete(String caseId, String imageId) {
 		try {
-			Files.deleteIfExists(resolve(id));
+			Files.deleteIfExists(resolve(caseId, imageId));
+			Files.deleteIfExists(resolveLegacy(imageId));
 		} catch (IOException exception) {
 			throw new ImageStorageException(exception);
 		}
 	}
 
-	private Path resolve(String id) {
+	private Path resolve(String caseId, String imageId) {
 		try {
-			UUID uuid = UUID.fromString(id);
-			if (!uuid.toString().equals(id)) {
-				throw new IllegalArgumentException();
-			}
-			return root.resolve(id);
+			validateUuid(caseId);
+			validateUuid(imageId);
+			return root.resolve("chamados").resolve(caseId).resolve(imageId);
 		} catch (IllegalArgumentException exception) {
 			throw new ImageStorageException(exception);
+		}
+	}
+
+	private Path resolveLegacy(String imageId) {
+		try {
+			validateUuid(imageId);
+			return root.resolve(imageId);
+		} catch (IllegalArgumentException exception) {
+			throw new ImageStorageException(exception);
+		}
+	}
+
+	private void validateUuid(String value) {
+		UUID uuid = UUID.fromString(value);
+		if (!uuid.toString().equals(value)) {
+			throw new IllegalArgumentException();
 		}
 	}
 }

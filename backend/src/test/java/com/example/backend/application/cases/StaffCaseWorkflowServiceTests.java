@@ -123,7 +123,8 @@ class StaffCaseWorkflowServiceTests {
 		CaseDocument current = caseOf(CaseStatus.EM_ATENDIMENTO, PublicationState.APROVADO);
 		MultipartFile file = mock(MultipartFile.class);
 		when(caseRepository.findById("case-id")).thenReturn(Optional.of(current));
-		when(images.storeNewImages(List.of(file), 0)).thenReturn(List.of(image("resolution-image", false)));
+		when(images.storeNewImages("case-id", List.of(file), 0))
+				.thenReturn(List.of(image("resolution-image", false)));
 		when(caseRepository.save(any(CaseDocument.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
 		ApiException exception = assertThrows(

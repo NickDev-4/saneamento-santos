@@ -55,7 +55,7 @@ class CitizenCaseServiceTests {
 		when(userAccountRepository.findById(owner.id())).thenReturn(Optional.of(userAccount()));
 		when(caseTypeRepository.findById("tipo-id"))
 				.thenReturn(Optional.of(new CaseTypeDocument("tipo-id", "Vazamento", true)));
-		when(images.storeNewImages(any(), eq(0))).thenReturn(List.of(image));
+		when(images.storeNewImages(any(), any(), eq(0))).thenReturn(List.of(image));
 		when(caseRepository.save(any(CaseDocument.class))).thenAnswer(invocation -> withId(
 				invocation.getArgument(0), "case-id"));
 
@@ -86,7 +86,7 @@ class CitizenCaseServiceTests {
 
 		assertEquals(HttpStatus.NOT_FOUND, exception.status());
 		verify(caseRepository, never()).save(any(CaseDocument.class));
-		verify(images, never()).storeNewImages(any(), anyInt());
+		verify(images, never()).storeNewImages(any(), any(), anyInt());
 	}
 
 	@Test
@@ -151,7 +151,7 @@ class CitizenCaseServiceTests {
 		when(caseRepository.findById("case-id")).thenReturn(Optional.of(current));
 		when(caseTypeRepository.findById("tipo-id"))
 				.thenReturn(Optional.of(new CaseTypeDocument("tipo-id", "Vazamento", true)));
-		when(images.storeNewImages(List.of(), 1)).thenReturn(List.of());
+		when(images.storeNewImages("case-id", List.of(), 1)).thenReturn(List.of());
 		when(caseRepository.save(any(CaseDocument.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
 		var response = service.edit(
@@ -160,7 +160,7 @@ class CitizenCaseServiceTests {
 		assertEquals("Vazamento próximo à residência", response.descricao());
 		assertEquals(List.of("image-id"), response.imagens().stream().map(image -> image.id()).toList());
 		assertEquals(2, response.atualizacoes().size());
-		verify(images).deleteRemovedImages(List.of());
+		verify(images).deleteRemovedImages("case-id", List.of());
 	}
 
 	@Test
@@ -191,7 +191,7 @@ class CitizenCaseServiceTests {
 		assertEquals(
 				"A reincidência deve apontar para um chamado resolvido.",
 				exception.fieldErrors().get("reincidenciaDe"));
-		verify(images, never()).storeNewImages(any(), anyInt());
+		verify(images, never()).storeNewImages(any(), any(), anyInt());
 	}
 
 	private CaseDocument savedCase() {

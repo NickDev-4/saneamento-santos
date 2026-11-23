@@ -42,7 +42,7 @@ class CaseImageServiceTests {
 		String id = UUID.randomUUID().toString();
 		CaseDocument item = caseWithImage(id, CaseStatus.RECEBIDO, PublicationState.PENDENTE, false);
 		when(caseRepository.findFirstByImageId(id)).thenReturn(Optional.of(item));
-		when(storage.read(id)).thenReturn(new byte[] { 1, 2, 3 });
+		when(storage.read("case-id", id)).thenReturn(new byte[] { 1, 2, 3 });
 
 		ApiException denied = assertThrows(
 				ApiException.class,
@@ -52,7 +52,7 @@ class CaseImageServiceTests {
 		assertEquals(HttpStatus.NOT_FOUND, denied.status());
 		assertEquals("image/png", result.contentType());
 		assertArrayEquals(new byte[] { 1, 2, 3 }, result.content());
-		verify(storage).read(id);
+		verify(storage).read("case-id", id);
 	}
 
 	@Test
@@ -64,7 +64,7 @@ class CaseImageServiceTests {
 		ApiException denied = assertThrows(ApiException.class, () -> service.publicImage(id));
 
 		assertEquals(HttpStatus.NOT_FOUND, denied.status());
-		verify(storage, never()).read(id);
+		verify(storage, never()).read("case-id", id);
 	}
 
 	@Test
@@ -72,7 +72,7 @@ class CaseImageServiceTests {
 		String id = UUID.randomUUID().toString();
 		CaseDocument approvedImage = caseWithImage(id, CaseStatus.RESOLVIDO, PublicationState.APROVADO, true);
 		when(caseRepository.findFirstByImageId(id)).thenReturn(Optional.of(approvedImage));
-		when(storage.read(id)).thenReturn(new byte[] { 4, 5, 6 });
+		when(storage.read("case-id", id)).thenReturn(new byte[] { 4, 5, 6 });
 
 		var result = service.publicImage(id);
 
@@ -85,13 +85,14 @@ class CaseImageServiceTests {
 		MockMultipartFile file = new MockMultipartFile(
 				"imagens", "client-name.png", "text/plain", pngHeader());
 
-		List<CaseDocument.ImageSnapshot> result = service.storeNewImages(List.of(file), 0);
+		String caseId = UUID.randomUUID().toString();
+		List<CaseDocument.ImageSnapshot> result = service.storeNewImages(caseId, List.of(file), 0);
 
 		assertEquals(1, result.size());
 		assertEquals("image/png", result.get(0).contentType());
 		assertEquals("/api/v1/imagens/" + result.get(0).id(), result.get(0).url());
 		ArgumentCaptor<byte[]> content = ArgumentCaptor.forClass(byte[].class);
-		verify(storage).store(eq(result.get(0).id()), content.capture());
+		verify(storage).store(eq(caseId), eq(result.get(0).id()), content.capture());
 		assertArrayEquals(pngHeader(), content.getValue());
 	}
 
