@@ -116,7 +116,7 @@
 }
 .bottom-nav {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   height: calc(var(--nav-height) + env(safe-area-inset-bottom));
   padding: 8px 9px calc(8px + env(safe-area-inset-bottom));
   position: fixed;

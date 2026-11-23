@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { resolveApiImageUrl } from '../src/services/http/image-url.ts';
+import { resolveApiImageUrl } from '../src/shared/lib/image-url.ts';
 
 test('resolves API image paths against a separate API origin', () => {
   assert.equal(

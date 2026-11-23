@@ -1,7 +1,7 @@
 import type { Case } from '@/contracts';
 import { environment } from '@/config/environment';
 import type { CaseDetailController } from '@/features/cases/hooks/useCaseDetailPage';
-import { resolveApiImageUrl } from '@/services/http/image-url';
+import { resolveApiImageUrl } from '@/shared/lib/image-url';
 import { Dialog } from '@/shared/ui/Dialog';
 
 type Props = Pick<CaseDetailController, 'setGalleryOpen'> & { c: Case };

@@ -13,10 +13,6 @@ export function BottomNavigation() {
         <Map size={22} />
         <span>Mapa</span>
       </NavLink>
-      <NavLink to={main.to}>
-        <main.Icon size={22} />
-        <span>{institutional ? main.label : 'Chamados'}</span>
-      </NavLink>
       {!institutional && (
         <NavLink className="register-nav" to="/registrar">
           <span className="register-orb">
@@ -25,6 +21,10 @@ export function BottomNavigation() {
           <span>Registrar</span>
         </NavLink>
       )}
+      <NavLink to={main.to}>
+        <main.Icon size={22} />
+        <span>{institutional ? main.label : 'Chamados'}</span>
+      </NavLink>
       <NavLink to={user ? '/perfil' : '/entrar'}>
         <UserRound size={22} />
         <span>{user ? 'Perfil' : 'Entrar'}</span>

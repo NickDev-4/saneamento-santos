@@ -202,7 +202,9 @@ class StaffCaseWorkflowServiceTests {
 		CaseDocument main = new CaseDocument(
 				"main-id", "SS-2026-MAIN", "type-id", "Tipo", "Descrição", Instant.now(), Instant.now(),
 				Instant.now(), null, null, CaseStatus.EM_ATENDIMENTO, PublicationState.APROVADO, null,
-				List.of(), null, List.of(), "main-owner", null, null, 2L);
+				List.of(), null, List.of(new CaseDocument.UpdateSnapshot(
+						"main-initial-update", "Chamado recebido", Instant.now(), "Recebido", true, "main-owner")),
+				"main-owner", null, null, 2L);
 		when(caseRepository.findById("duplicate-id")).thenReturn(Optional.of(duplicate));
 		when(caseRepository.findById("main-id")).thenReturn(Optional.of(main));
 		when(caseRepository.findByVinculoId("main-id")).thenReturn(List.of());

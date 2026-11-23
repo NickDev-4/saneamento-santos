@@ -1,6 +1,6 @@
 import { environment } from '@/config/environment';
 import type { ReportFormController } from '@/features/report/hooks/useReportForm';
-import { resolveApiImageUrl } from '@/services/http/image-url';
+import { resolveApiImageUrl } from '@/shared/lib/image-url';
 import { Camera, ImagePlus, X } from 'lucide-react';
 
 type Props = Pick<
