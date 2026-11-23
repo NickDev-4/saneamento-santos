@@ -6,7 +6,7 @@ Front-end de uma aplicação para registrar e acompanhar problemas de esgoto em 
 
 O front-end está implementado com React, TypeScript e Vite e usa a API Java por padrão. O modo `demo` continua disponível para explorar telas sem servidor; nele, dados e sessão ficam em memória e são reiniciados ao recarregar a página.
 
-O backend Java/Spring inclui identidade, consultas públicas, abertura e acompanhamento de chamados, imagens e workflows da Sabesp, notificações e indicadores da Prefeitura. O adaptador HTTP do front-end usa a API por padrão. A API publica OpenAPI em `/v3/api-docs` e Swagger em `/swagger-ui/index.html`. Para registrar novos chamados, configure o GeoJSON oficial da área atendida em `SANTOS_SERVICE_AREA_GEOJSON`. As operações de workflow com notificações atômicas exigem MongoDB compatível com transações (replica set); o storage local de imagens requer volume persistente em produção.
+O backend Java/Spring inclui identidade, consultas públicas, abertura e acompanhamento de chamados, imagens e workflows da Sabesp, notificações e indicadores da Prefeitura. O adaptador HTTP do front-end usa a API por padrão. A API publica OpenAPI em `/v3/api-docs` e Swagger em `/swagger-ui/index.html`. O projeto inclui como padrão local o limite municipal de Santos do IBGE para validar os pontos dos chamados. Em produção, configure o polígono específico da área de atendimento em `SANTOS_SERVICE_AREA_GEOJSON`. As operações de workflow com notificações atômicas exigem MongoDB compatível com transações (replica set); o storage local de imagens requer volume persistente em produção.
 
 ## Executar no Windows
 
@@ -73,7 +73,7 @@ cd .\backend
 
 A API fica em `http://127.0.0.1:8080`, como esperado pelo proxy do Vite. `GET /api/v1/health` verifica se a aplicação responde. Consulte a especificação em `http://127.0.0.1:8080/v3/api-docs` ou a interface em `http://127.0.0.1:8080/swagger-ui/index.html`. Execute `.\gradlew.bat test bootJar` para verificar e empacotar o backend.
 
-Uploads usam arquivos com nomes opacos e armazenamento em filesystem local, configurável por `FILES_STORAGE_DIRECTORY` (padrão `./uploads`). Em produção, esse diretório precisa ser persistente e compartilhado entre instâncias; não use disco efêmero. O cadastro de chamados exige o polígono oficial da área em GeoJSON, configurado por `SANTOS_SERVICE_AREA_GEOJSON`. Sem esse arquivo, a criação/edição retorna `503 SERVICE_AREA_UNAVAILABLE`. Os workflows que atualizam chamado e notificações em conjunto requerem MongoDB em replica set.
+Uploads usam arquivos com nomes opacos e armazenamento em filesystem local, configurável por `FILES_STORAGE_DIRECTORY` (padrão `./uploads`). Em produção, esse diretório precisa ser persistente e compartilhado entre instâncias; não use disco efêmero. O cadastro de chamados usa o polígono municipal de Santos incluído no classpath quando `SANTOS_SERVICE_AREA_GEOJSON` não é definido. Esse limite administrativo é uma aproximação para a demonstração; configure o GeoJSON da área real de atendimento em produção. Os workflows que atualizam chamado e notificações em conjunto requerem MongoDB em replica set.
 
 ### Dados fictícios para apresentação
 

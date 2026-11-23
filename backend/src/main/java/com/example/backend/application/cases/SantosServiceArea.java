@@ -2,6 +2,7 @@ package com.example.backend.application.cases;
 
 import com.example.backend.api.exception.ApiException;
 import com.example.backend.infrastructure.persistence.cases.CaseDocument.LocationSnapshot;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.geojson.GeoJsonReader;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import tools.jackson.core.JacksonException;
@@ -50,18 +52,29 @@ public class SantosServiceArea {
 			throw new ServiceAreaUnavailableException();
 		}
 		try {
-			Path path = Path.of(boundaryFile).toAbsolutePath().normalize();
-			if (!Files.isRegularFile(path)) {
-				throw new ServiceAreaUnavailableException();
+			JsonNode root;
+			if (boundaryFile.startsWith("classpath:")) {
+				var resource = new ClassPathResource(boundaryFile.substring("classpath:".length()));
+				if (!resource.exists()) {
+					throw new ServiceAreaUnavailableException();
+				}
+				try (var inputStream = resource.getInputStream()) {
+					root = objectMapper.readTree(inputStream);
+				}
+			} else {
+				Path path = Path.of(boundaryFile).toAbsolutePath().normalize();
+				if (!Files.isRegularFile(path)) {
+					throw new ServiceAreaUnavailableException();
+				}
+				root = objectMapper.readTree(path.toFile());
 			}
-			JsonNode root = objectMapper.readTree(path.toFile());
 			List<Geometry> polygons = new ArrayList<>();
 			collectPolygons(root, polygons);
 			if (polygons.isEmpty()) {
 				throw new ServiceAreaUnavailableException();
 			}
 			return polygons;
-		} catch (JacksonException | IllegalArgumentException | ParseException exception) {
+		} catch (JacksonException | IllegalArgumentException | ParseException | IOException exception) {
 			throw new ServiceAreaUnavailableException(exception);
 		}
 	}
