@@ -2,7 +2,9 @@ package com.example.backend.application.addresses;
 
 import java.net.http.HttpClient;
 import java.time.Duration;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -27,12 +29,27 @@ public class ViaCepClient {
 
 	public ViaCepResponse lookup(String cep) {
 		try {
-			return restClient.get()
+			Map<String, Object> response = restClient.get()
 					.uri("/{cep}/json/", cep)
 					.retrieve()
-					.body(ViaCepResponse.class);
+					.body(new ParameterizedTypeReference<>() {
+					});
+			if (response == null) {
+				return null;
+			}
+			return new ViaCepResponse(
+					text(response.get("cep")),
+					text(response.get("logradouro")),
+					text(response.get("bairro")),
+					text(response.get("localidade")),
+					text(response.get("uf")),
+					Boolean.TRUE.equals(response.get("erro")));
 		} catch (RestClientException exception) {
 			throw new AddressProviderUnavailableException();
 		}
+	}
+
+	private String text(Object value) {
+		return value instanceof String text ? text : "";
 	}
 }
