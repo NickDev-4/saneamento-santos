@@ -90,14 +90,15 @@ export function useReportForm() {
     setEndereco((a) => ({ ...a, [key]: value }));
   }
   async function lookup() {
-    if (endereco.cep.length !== 8) {
+    const cep = endereco.cep.replace(/\D/g, '');
+    if (cep.length !== 8) {
       setErrors((e) => ({ ...e, cep: 'Informe os 8 números do CEP.' }));
       return;
     }
     setLooking(true);
     setLookupMessage('');
     try {
-      const result = await address(endereco.cep);
+      const result = await address(cep);
       if (result.cidade && result.cidade !== 'Santos')
         throw new Error('O atendimento deste projeto é para Santos. Confira o CEP.');
       const next = { ...endereco, ...result };
