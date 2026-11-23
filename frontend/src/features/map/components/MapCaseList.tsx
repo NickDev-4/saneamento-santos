@@ -10,7 +10,11 @@ import { ChevronDown } from 'lucide-react';
 
 import { statusLabels } from '@/contracts';
 
-import { publicStatuses } from '@/features/cases/constants/publicStatuses';
+import {
+  activePublicStatuses,
+  allStatusesFilterValue,
+  finalizedFilterValue,
+} from '@/features/cases/constants/publicStatuses';
 
 import { X } from 'lucide-react';
 
@@ -81,9 +85,9 @@ export function MapCaseList({
       </div>
       <div className="filter-chips" aria-label="Filtrar por status">
         <button className={!status ? 'active' : ''} onClick={() => update('status', '')}>
-          Todos
+          Em andamento
         </button>
-        {publicStatuses.map((s) => (
+        {activePublicStatuses.map((s) => (
           <button
             key={s}
             className={status === s ? 'active' : ''}
@@ -92,6 +96,18 @@ export function MapCaseList({
             {s === 'VISITA_AGENDADA' ? 'Agendados' : statusLabels[s]}
           </button>
         ))}
+        <button
+          className={status === finalizedFilterValue ? 'active' : ''}
+          onClick={() => update('status', finalizedFilterValue)}
+        >
+          Finalizados
+        </button>
+        <button
+          className={status === allStatusesFilterValue ? 'active' : ''}
+          onClick={() => update('status', allStatusesFilterValue)}
+        >
+          Todos
+        </button>
       </div>
       {bairro && (
         <button className="applied-filter" onClick={() => update('bairro', '')}>

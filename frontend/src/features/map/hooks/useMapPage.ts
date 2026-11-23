@@ -2,6 +2,11 @@ import { useCases } from '@/features/cases/hooks/useCases';
 import { address } from '@/features/cases/lib/address';
 import { useSearchParams } from 'react-router-dom';
 import { useState } from 'react';
+import {
+  allStatusesFilterValue,
+  finalizedFilterValue,
+  finalizedStatuses,
+} from '@/features/cases/constants/publicStatuses';
 
 const normalize = (text: string) =>
   text
@@ -27,7 +32,13 @@ export function useMapPage() {
   }
   const filtered = (data || []).filter(
     (c) =>
-      (!status || c.status === status) &&
+      (!status
+        ? !finalizedStatuses.includes(c.status)
+        : status === allStatusesFilterValue
+          ? true
+          : status === finalizedFilterValue
+            ? finalizedStatuses.includes(c.status)
+            : c.status === status) &&
       (!bairro || c.endereco.bairro === bairro) &&
       normalize(`${address(c)} ${c.endereco.bairro} ${c.protocolo} ${c.tipo}`).includes(
         normalize(search),

@@ -49,6 +49,7 @@ public class PublicCaseQueryService {
 		List<Criteria> filters = new ArrayList<>();
 		filters.add(Criteria.where("publicacao").is(PublicationState.APROVADO));
 		filters.add(Criteria.where("status").nin(CasePublicVisibility.hiddenStatuses()));
+		filters.add(Criteria.where("endereco.cidade").regex("^Santos$", "i"));
 
 		if (status != null && !status.isBlank()) {
 			try {
